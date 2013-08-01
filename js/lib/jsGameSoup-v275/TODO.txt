@@ -1,0 +1,77 @@
+ * Start doing unit tests = http://qunitjs.com/
+ * download page - allow user to assemble minified thing from component parts
+ * remove dependencies from the project and make them get sucked in some other way
+ * RSS feed on site
+ * Resize event
+   * callback on all entities
+   * look at Nick's resize code http://onetwenty.org/upload/soupbox/
+   * re-jig the canvas size to make it still fit it's container
+
+old notes
+---------
+
+* move lineOnLine and pointInPoly out of the global namespace
+* test multiplayer demo with all three browsers at the same time for a while
+* put json2.js fetch into the documentation generation Makefile externals
+* update FallingGame with audio
+* update AsteroidsTNG with audio
+
+* in internet explorer, "caller" is not defined perhaps - check multiplayer code & grep for others
+
+* nesters.js - child and parent heirarchies
+* Wojtek/vibrant's "canvas passthrough" camera method for a camera.js class
+
+* resize code from "Lynx" on tigsource:
+
+    // When the window is resized, expand the canvas to fit
+    var resizeHandler = function(ev) {
+      var canvas = gs.canvas;
+      var width = window.innerWidth;
+      var height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      canvas.style.width = width;
+      canvas.style.height = height;
+      gs.width = width;
+      gs.height = height;
+    }
+    if (window.addEventListener) {
+      window.addEventListener('resize', resizeHandler, false);
+    } else if (document.body.attachEvent) {
+      document.body.attachEvent('onresize', resizeHandler);
+    } else if(document.body.onresize) {
+      document.body.onresize = resizeHandler;
+    }
+
+* on addEntity() add methods to the object
+  * addEntity() method for objects to nest objects?
+    * canvas coordinate passhthrough optionally?
+  * set_priority() method for updating priority of an object?
+
+* tutorial with:
+ * progress bars
+ * sprites
+ * vectors
+ * audio
+ * keyboard/pointer input
+ * collisions
+
+* multiplayer server + examples + documentation
+
+* finish tmxmap stuff + demo
+
+* method to add a whole array of new entities
+* method to erase a whole array of entities
+
+* make a method to get actual framerate
+* menu.js - creates a nice full-screen text menu
+* piemenu.js - creates a piemenu
+* use twinhelix pngfix on site
+* external library demo links direct in readme
+* extend canvas with useful methods (like drawlines)
+* double buffering
+  * http://www.felinesoft.com/blog/index.php/2010/09/accelerated-game-programming-with-html5-and-canvas/
+  * FlashCanvas works fastest from inside same canvas - double canvas width and buffer from left-to-right
+
+* try and get audio onload working on all platforms
+* fix internet explorer offset bug
