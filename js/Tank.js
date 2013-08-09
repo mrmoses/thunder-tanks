@@ -1,87 +1,100 @@
-function Tank(gs) {
-    var game = gs;
+function Tank(tt) {
+    var SELF = this;
 
-    var length = 60;
-    var width = 50;
+    /** @type ThunderTanks */
+    this.tt = tt;
 
-    var x = 100; //gs.width / 2; // center of tank
-    var y = 100; //gs.height / 2; // center of tank
-    var angle = MathUtil.degreesToRadians(45); // angle in radians
-    var speed = 0;
-    var maxSpeed = 8;
+    /** @type JSGameSoup */
+    this.game = tt.game;
 
-    var aim_angle = MathUtil.degreesToRadians(0);
-    var firing = false;
-    var fireRate = 5; // number of shots per sec
-    var fireCooldown = 0;
+    var _private = {
+        length: 60,
+        width: 50,
+        x: 100,
+        y: 100,
+        angle: MathUtil.degreesToRadians(45), // angle in radians
+        speed: 0,
+        maxSpeed: 8,
+        aimAngle: MathUtil.degreesToRadians(0),
+        firing: false,
+        fireRate: 5, // number of shots per sec
+        fireCooldown: 0
+    }
 
+    /**
+     * @param {JSGameSoup} gs JSGameSoup instance
+     */
     this.update = function(gs) {
         // move tank
-        x = x + speed * Math.cos(angle);
-        y = y + speed * Math.sin(angle);
+        _private.x = _private.x + _private.speed * Math.cos(_private.angle);
+        _private.y = _private.y + _private.speed * Math.sin(_private.angle);
 
         // update aim
-        var mouseposition = gs.pointerPosition;
-        var mousex = mouseposition[0];
-        var mousey = mouseposition[1];
-        aim_angle = MathUtil.getAngle(x,y,mousex,mousey);
+        var mouseposition = gs.pointerPosition,
+            mousex = mouseposition[0]
+            mousey = mouseposition[1];
+        _private.aimAngle = MathUtil.getAngle(_private.x,_private.y,mousex,mousey);
 
-        if (firing && fireCooldown === 0) {
+        if (_private.firing && _private.fireCooldown === 0) {
             this.fireBullet();
         }
-        if (fireCooldown > 0) {
-            fireCooldown--;
+        if (_private.fireCooldown > 0) {
+            _private.fireCooldown--;
         }
     }
 
+    /**
+     * @param {CanvasRenderingContext2D} c canvas context
+     * @param {JSGameSoup} gs JSGameSoup instance
+     */
     this.draw = function(c, gs) {
         // draw tank
         c.save(); //save the current draw state
-        c.translate(x,y); //set drawing area to where the tank is
-        c.rotate(angle); //rotate drawing area to tank's angle
-        c.fillRect(-length/2, -width/2, length, width); // draw the tank
+        c.translate(_private.x,_private.y); //set drawing area to where the tank is
+        c.rotate(_private.angle); //rotate drawing area to tank's angle
+        c.fillRect(-_private.length/2, -_private.width/2, _private.length, _private.width); // draw the tank
         c.restore(); //restore the previous draw state
 
         // draw cannon
         c.save();
-        c.translate(x,y);
-        c.rotate(aim_angle);
-        c.fillRect(0, 0, length, 5);
+        c.translate(_private.x,_private.y);
+        c.rotate(_private.aimAngle);
+        c.fillRect(0, 0, _private.length, 5);
         c.restore();
     }
 
     // up (W)
     this.keyDown_38 = this.keyDown_87 = function () {
-        speed = 1;
+        _private.speed = 1;
     }
     this.keyHeld_38 = this.keyHeld_87 = function () {
-        if (speed < maxSpeed)
-            speed += 1;
+        if (_private.speed < _private.maxSpeed)
+            _private.speed += 1;
     }
     this.keyUp_38 = this.keyUp_87 = function () {
-        speed = 0;
+        _private.speed = 0;
     }
 
     // down (S)
     this.keyDown_40 = this.keyDown_83 = function () {
-        speed = -0.3;
+        _private.speed = -0.3;
     }
     this.keyHeld_40 = this.keyHeld_83 = function () {
-        if (speed > -maxSpeed)
-            speed -= 0.3;
+        if (_private.speed > -_private.maxSpeed)
+            _private.speed -= 0.3;
     }
     this.keyUp_40 = this.keyUp_83 = function () {
-        speed = 0;
+        _private.speed = 0;
     }
 
     // left (A)
     this.keyHeld_37 = this.keyDown_37 = this.keyHeld_65 = this.keyDown_65 = function () {
-        angle -= 0.1;
+        _private.angle -= 0.1;
     }
 
     // right (D)
     this.keyHeld_39 = this.keyDown_39 = this.keyHeld_68 = this.keyDown_68 = function () {
-        angle += 0.1;
+        _private.angle += 0.1;
     }
 
     this.keyDown = function (keyCode) {
@@ -95,7 +108,7 @@ function Tank(gs) {
         //console.log("tank pointerDown", button);
         switch (button) {
             case 0:
-                firing = true;
+                _private.firing = true;
                 break;
             case 2:
                 break;
@@ -106,7 +119,7 @@ function Tank(gs) {
         //console.log("tank pointerUp", button);
         switch (button) {
             case 0:
-                firing = false;
+                _private.firing = false;
                 break;
             case 2:
                 break;
@@ -114,17 +127,33 @@ function Tank(gs) {
     }
 
     this.pointerBox = function() {
-        return [0, 0, game.width, game.height];
+        return [0, 0, this.game.width, this.game.height];
     }
 
     this.fireBullet = function() {
-        fireCooldown = game.framerate / fireRate;
+        _private.fireCooldown = this.game.framerate / _private.fireRate;
 
-        var mouseposition = gs.pointerPosition;
-        var mousex = mouseposition[0];
-        var mousey = mouseposition[1];
+        var mouseposition = this.game.pointerPosition,
+            mousex = mouseposition[0]
+            mousey = mouseposition[1];
 
-        var b = new Bullet(game,x,y,mousex,mousey);
-        game.addEntity(b);
+        tt.addBullet(_private.x,_private.y,mousex,mousey);
+    }
+
+    /* @returns[Array] a rectangle of the boundaries of the entity with the form [x, y, w, h] */
+    this.get_collision_aabb = function() {
+        return [_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width];
+    }
+
+    this.collide_aabb = function(entity, result) {
+        //console.log('Tank collide_aabb', entity, result);
+    }
+
+    this.collide_circle = function(entity, result) {
+        //console.log('Tank collide_circle', entity, result);
+    }
+
+    this.collide_polygon = function(entity, result) {
+        //console.log('Tank collide_polygon', entity, result);
     }
 }
