@@ -1,11 +1,13 @@
-
+if (typeof io != 'undefined') {
+    var socket = io.connect();
+}
 var ThunderTanks = function() {
     var SELF = this;
 
     /** @type JSGameSoup */
     this.game;
-    /** @type Tank */
-    this.p1;
+
+    this.players = {};
 
     /** @type Array */
     this.obstacles = [];
@@ -24,10 +26,14 @@ var ThunderTanks = function() {
         return;
     }
 
-    this.addPlayer1 = function() {
-        this.p1 = new Tank(this);
-        this.game.addEntity(this.p1);
-        return this.p1;
+    /**
+     * @param {Object} data The players data (id, x, y)
+     * @param {Boolean} remote True if the player is a remote player
+     */
+    this.addPlayer = function(data, remote) {
+        this.players[data.id] = new Tank(this, data, remote);
+        this.game.addEntity(this.players[data.id]);
+        return this.players[data.id];
     }
 
     this.addMap = function() {
@@ -60,11 +66,27 @@ var ThunderTanks = function() {
             // add an instance of the map
             SELF.addMap();
 
-            // add player 1
-            SELF.addPlayer1();
-
             // launch the game
             SELF.game.launch();
+
+            if (typeof socket != 'undefined') {
+                socket.on('add-player', function (data) {
+                    // add player
+                    SELF.addPlayer(data, data.id !== socket.socket.sessionid);
+                });
+                socket.on('remote-player-update', function (data) {
+                    // update player
+                    SELF.players[data.id].playerUpdate(data);
+                });
+
+                socket.on('delete-player', function (id) {
+                    SELF.game.delEntity(SELF.players[id]);
+                    delete SELF.players[id];
+                });
+            } else {
+                SELF.addPlayer({id:'demo'}, false);
+            }
+
         });
     })();
 },
