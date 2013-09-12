@@ -156,6 +156,16 @@ function Tank(tt, data, remote) {
                 mousey = mouseposition[1];
 
             tt.addBullet(_private.x,_private.y,mousex,mousey);
+
+            // send bullets to remote players
+            if (!_private.remote && typeof socket != 'undefined') {
+                socket.emit('add-bullet', {
+                    startx: _private.x,
+                    starty: _private.y,
+                    targetx: mousex,
+                    targety: mousey
+                });
+            }
         }
     }
 

@@ -59,6 +59,12 @@ function Player(socket) {
     _private.socket.broadcast.emit('remote-player-update', players[data.id]);
   });
 
+  // when this player is updated, send data to all remotes
+  _private.socket.on('add-bullet', function (data) {
+    //send update to other users
+    _private.socket.broadcast.emit('add-bullet', data);
+  });
+
   /* when a player disconnects */
   _private.socket.on('disconnect', function () {
     console.log("player disconnected " + SELF.id);

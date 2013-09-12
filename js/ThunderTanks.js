@@ -42,6 +42,14 @@ var ThunderTanks = function() {
         return map;
     }
 
+    /** Adds a bullet to the game.
+     *
+     * @param {int} startx The starting x coordinate.
+     * @param {int} starty The starting y coordinate.
+     * @param {int} targetx The target x coordinate.
+     * @param {int} targety The target y coordinate.
+     * @returns {Bullet} An instance of a Bullet.
+     */
     this.addBullet = function(startx, starty, targetx, targety) {
         var b = new Bullet(this, _private.bullets.length, startx, starty, targetx, targety);
         _private.bullets.push(b);
@@ -74,11 +82,14 @@ var ThunderTanks = function() {
                     // add player
                     SELF.addPlayer(data, data.id !== socket.socket.sessionid);
                 });
+                socket.on('add-bullet', function (data) {
+                    // add bullet
+                    SELF.addBullet(data.startx, data.starty, data.targetx, data.targety);
+                });
                 socket.on('remote-player-update', function (data) {
                     // update player
                     SELF.players[data.id].playerUpdate(data);
                 });
-
                 socket.on('delete-player', function (id) {
                     SELF.game.delEntity(SELF.players[id]);
                     delete SELF.players[id];
