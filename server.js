@@ -1,8 +1,9 @@
 var express = require('express')
   , path = require('path')
   , app = express()
+  , host = process.env.IP || 'localhost'
   , port = process.env.PORT || 5000
-  , io = require('socket.io').listen(app.listen(port));
+  , io = require('socket.io').listen(app.listen(port, host));
 
 app.configure(function(){
   // serve css and js folders as static files
