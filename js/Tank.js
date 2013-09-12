@@ -41,7 +41,7 @@ function Tank(tt, data, remote) {
         if (!_private.remote) {
             // update aim
             var mouseposition = gs.pointerPosition,
-                mousex = mouseposition[0]
+                mousex = mouseposition[0],
                 mousey = mouseposition[1];
             _private.aimAngle = MathUtil.getAngle(_private.x,_private.y,mousex,mousey);
         }
@@ -56,7 +56,7 @@ function Tank(tt, data, remote) {
         if (!_private.remote && typeof socket != 'undefined') {
             socket.emit('client-player-update', this.getData());
         }
-    }
+    };
 
     /**
      * @param {CanvasRenderingContext2D} c canvas context
