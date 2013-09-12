@@ -14,7 +14,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         targetx: targetx || this.game.random(0,this.game.width),
         targety: targety || this.game.random(0,this.game.height),
         speed: speed || 10,
-        radius: 5,
+        radius: 3,
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
         bounces: 1
     };

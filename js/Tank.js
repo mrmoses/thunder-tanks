@@ -16,13 +16,13 @@ function Tank(tt, data, remote) {
     this.game = tt.game;
 
     var _private = {
-        length: 60,
-        width: 50,
+        length: 35,
+        width: 25,
         x: 100, //data.x,
         y: 100, //data.y,
         angle: MathUtil.degreesToRadians(45), // angle in radians
         speed: 0,
-        maxSpeed: 8,
+        maxSpeed: 4,
         aimAngle: MathUtil.degreesToRadians(0),
         firing: false,
         fireRate: 5, // number of shots per sec
