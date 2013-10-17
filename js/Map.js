@@ -23,9 +23,22 @@ function Map(tt) {
         var right =  new Block(this.game.width, -5, 100, this.game.height + 5);
         this.tt.addObstacle(right);
 
+
         // block in the middle
-        var block1 = new Block(300,300,100,100);
+        var block1 = new Block(this.game.width*.25-50, this.game.height*.25-50, 100, 100);
         this.tt.addObstacle(block1);
+
+        // block in the middle
+        var block2 = new Block(this.game.width*.75-50, this.game.height*.25-50, 100, 100);
+        this.tt.addObstacle(block2);
+
+        // block in the middle
+        var block3 = new Block(this.game.width*.25-50, this.game.height*.75-50, 100, 100);
+        this.tt.addObstacle(block3);
+
+        // block in the middle
+        var block4 = new Block(this.game.width*.75-50, this.game.height*.75-50, 100, 100);
+        this.tt.addObstacle(block4);
     }
 }
 
