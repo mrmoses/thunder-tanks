@@ -189,6 +189,18 @@ function Tank(tt, data, remote) {
       };
     }
 
+    this.kill = function() {
+        this.tt.removePlayer(SELF.id);
+        if (!_private.remote) {
+            alert("You dead!");
+
+            // remove this player from all remotes
+            if (typeof socket != 'undefined') {
+                socket.emit('player-killed');
+            }
+        }
+    }
+
     /* @returns[Array] a rectangle of the boundaries of the entity with the form [x, y, w, h] */
     this.get_collision_aabb = function() {
         return [_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width];
@@ -196,6 +208,11 @@ function Tank(tt, data, remote) {
 
     this.collide_aabb = function(entity, result) {
         //console.log('Tank collide_aabb', entity, result);
+        if (entity instanceof Bullet) {
+            SELF.kill();
+        } else if (entity instanceof Block || entity instanceof Tank) {
+            _private.speed = 0;
+        }
     }
 
     this.collide_circle = function(entity, result) {

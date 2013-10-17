@@ -32,6 +32,10 @@ var ThunderTanks = function() {
 
         // collide bullets and bullets
         collide.circles(_private.bullets, _private.bullets);
+
+        // collide bullets and tanks
+        collide.aabb(_private.bullets, _private.players);
+
         return;
     }
 

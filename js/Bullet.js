@@ -58,28 +58,36 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     }
 
     this.collide_aabb = function(entity, result) {
-        if (!_private.bounces) {
-            this.kill();
-        } else {
-            _private.bounces--;
+        // bullet vs bullet (handled in collide_circle)
+
+        // bullet vs tank = dead
+        if (entity instanceof Tank) {
+            SELF.kill();
+
+        // bullet vs obstacle = bounce or die
+        } else if (entity instanceof Block || entity instanceof Tank) {
+            if (!_private.bounces) {
+                this.kill();
+            } else {
+                _private.bounces--;
+            }
+
+            entity_aabb = entity.get_collision_aabb();
+            bullet_aabb = this.get_collision_aabb();
+
+            var topDiff = Math.abs(entity_aabb[1] - bullet_aabb[1]);
+            var bottomDiff = Math.abs(entity_aabb[1] + entity_aabb[3] - bullet_aabb[1] + bullet_aabb[3]);
+            var leftDiff = Math.abs(entity_aabb[0] - bullet_aabb[0]);
+            var rightDiff = Math.abs(entity_aabb[0] + entity_aabb[2] - bullet_aabb[0] + bullet_aabb[2]);
+
+            // if bullet is between entity top and bottom, its probably a side collision
+            if (topDiff < leftDiff && topDiff < rightDiff ||
+                bottomDiff < leftDiff && bottomDiff < rightDiff) {
+                _private.angle *= -1;
+            } else {
+                _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
+            }
         }
-
-        entity_aabb = entity.get_collision_aabb();
-        bullet_aabb = this.get_collision_aabb();
-
-        var topDiff = Math.abs(entity_aabb[1] - bullet_aabb[1]);
-        var bottomDiff = Math.abs(entity_aabb[1] + entity_aabb[3] - bullet_aabb[1] + bullet_aabb[3]);
-        var leftDiff = Math.abs(entity_aabb[0] - bullet_aabb[0]);
-        var rightDiff = Math.abs(entity_aabb[0] + entity_aabb[2] - bullet_aabb[0] + bullet_aabb[2]);
-
-        // if bullet is between entity top and bottom, its probably a side collision
-        if (topDiff < leftDiff && topDiff < rightDiff ||
-            bottomDiff < leftDiff && bottomDiff < rightDiff) {
-            _private.angle *= -1;
-        } else {
-            _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
-        }
-
     }
 
     this.collide_circle = function(entity, result) {
@@ -89,6 +97,6 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     }
 
     this.collide_polygon = function(entity, result) {
-        //console.log('bullet collide_polygon', entity, result);
+        console.log('bullet collide_polygon', entity, result);
     }
 }
