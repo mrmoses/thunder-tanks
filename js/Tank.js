@@ -152,16 +152,18 @@ function Tank(tt, data, remote) {
             _private.fireCooldown = this.game.framerate / _private.fireRate;
 
             var mouseposition = this.game.pointerPosition,
-                mousex = mouseposition[0]
-                mousey = mouseposition[1];
+                mousex = mouseposition[0],
+                mousey = mouseposition[1],
+                barrelTipX = _private.x + _private.length * Math.cos(_private.aimAngle),
+                barrelTipY = _private.y + _private.length * Math.sin(_private.aimAngle);
 
-            tt.addBullet(_private.x,_private.y,mousex,mousey);
+            tt.addBullet(barrelTipX,barrelTipY,mousex,mousey);
 
             // send bullets to remote players
             if (!_private.remote && typeof socket != 'undefined') {
                 socket.emit('add-bullet', {
-                    startx: _private.x,
-                    starty: _private.y,
+                    startx: barrelTipX,
+                    starty: barrelTipY,
                     targetx: mousex,
                     targety: mousey
                 });
