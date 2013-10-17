@@ -16,7 +16,13 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         speed: speed || 10,
         radius: 3,
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
-        bounces: 1
+        bounces: 1,
+        animation: new Sprite(["center","center"], {
+            "move": [["images/bullet1.png", 7],["images/bullet2.png", 7]]
+        }, function() {
+            _private.animation.action("move");
+            _private.animation.angle(_private.angle);
+        })
     };
 
     /**
@@ -26,6 +32,9 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         // move bullet
         _private.x = _private.x + _private.speed * Math.cos(_private.angle);
         _private.y = _private.y + _private.speed * Math.sin(_private.angle);
+
+        // update sprite
+        _private.animation.update();
     }
 
     /**
@@ -33,14 +42,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.draw = function(c, gs) {
-        // draw bullet
-        c.beginPath();
-        c.arc(_private.x, _private.y, _private.radius, 0, 2 * Math.PI, false);
-        //c.fillStyle = 'green';
-        //c.fill();
-        c.lineWidth = 1;
-        //c.strokeStyle = '#003300';
-        c.stroke();
+        _private.animation.draw(c,[_private.x,_private.y]);
     }
 
     this.kill = function() {
@@ -87,6 +89,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
             } else {
                 _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
             }
+            _private.animation.angle(_private.angle);
         }
     }
 
