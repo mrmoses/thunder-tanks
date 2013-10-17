@@ -18,8 +18,8 @@ function Tank(tt, data, remote) {
     var _private = {
         length: 35,
         width: 25,
-        x: 100, //data.x,
-        y: 100, //data.y,
+        x: data.x || 100,
+        y: data.y || 100,
         angle: MathUtil.degreesToRadians(45), // angle in radians
         speed: 0,
         maxSpeed: 4,

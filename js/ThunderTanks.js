@@ -130,7 +130,18 @@ var ThunderTanks = function() {
                     SELF.removePlayer(id);
                 });
             } else {
-                SELF.addPlayer({id:'demo'}, false);
+                SELF.addPlayer({id:'demo', x: 100, y: 100}, false);
+
+                // enemy in the opposite corner
+                SELF.addPlayer({id:'enemy1', x: SELF.game.width - 100, y: SELF.game.height - 100}, true);
+
+                /** Target Practice
+                for (var x = 50; x <= 500; x+=100){
+                    for (var y = 50; y <= 500; y += 100) {
+                        SELF.addPlayer({id:'target'+x+y,x:x,y:y}, true);
+                    }
+                }
+                */
             }
 
         });
