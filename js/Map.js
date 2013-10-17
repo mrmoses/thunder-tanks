@@ -12,25 +12,20 @@ function Map(tt) {
 
         // top boundary
         var top =  new Block(-5, -100, this.game.width + 5, 100);
-        this.game.addEntity(top);
-        this.tt.obstacles.push(top);
+        this.tt.addObstacle(top);
 
         var bottom =  new Block(-5, this.game.height, this.game.width + 5, 100);
-        this.game.addEntity(bottom);
-        this.tt.obstacles.push(bottom);
+        this.tt.addObstacle(bottom);
 
         var left = new Block(-100, -5, 100, this.game.height + 5);
-        this.game.addEntity(left);
-        this.tt.obstacles.push(left);
+        this.tt.addObstacle(left);
 
         var right =  new Block(this.game.width, -5, 100, this.game.height + 5);
-        this.game.addEntity(right);
-        this.tt.obstacles.push(right);
+        this.tt.addObstacle(right);
 
         // block in the middle
         var block1 = new Block(300,300,100,100);
-        this.game.addEntity(block1);
-        this.tt.obstacles.push(block1);
+        this.tt.addObstacle(block1);
     }
 }
 

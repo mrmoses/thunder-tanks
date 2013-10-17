@@ -7,21 +7,30 @@ var ThunderTanks = function() {
     /** @type JSGameSoup */
     this.game;
 
-    this.players = {};
-
-    /** @type Array */
-    this.obstacles = [];
-
     var _private = {
+        /** Players by id **/
+        playersIndex: {},
+
+        /** @type Array Players array. */
+        players: [],
+
+        /** @type Array */
+        obstacles: [],
+
         /** @type Array */
         bullets: []
     };
 
     /**
+     * Game Update (collision checks)
+     *
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
-        collide.aabb(_private.bullets, this.obstacles);
+        //collide bullets and map objects
+        collide.aabb(_private.bullets, _private.obstacles);
+
+        // collide bullets and bullets
         collide.circles(_private.bullets, _private.bullets);
         return;
     }
@@ -31,15 +40,22 @@ var ThunderTanks = function() {
      * @param {Boolean} remote True if the player is a remote player
      */
     this.addPlayer = function(data, remote) {
-        this.players[data.id] = new Tank(this, data, remote);
-        this.game.addEntity(this.players[data.id]);
-        return this.players[data.id];
+        _private.playersIndex[data.id] = new Tank(this, data, remote);
+        _private.players.push(_private.playersIndex[data.id]);
+        this.game.addEntity(_private.playersIndex[data.id]);
+        return _private.playersIndex[data.id];
     }
 
     this.addMap = function() {
         var map = new Map(this);
         this.game.addEntity(map);
         return map;
+    }
+
+    this.addObstacle = function(obst) {
+        this.game.addEntity(obst);
+        _private.obstacles.push(obst);
+        return obst;
     }
 
     /** Adds a bullet to the game.
@@ -56,6 +72,22 @@ var ThunderTanks = function() {
         this.game.addEntity(b);
         return b;
     }
+
+    this.removePlayer = function(id) {
+        this.game.delEntity(_private.playersIndex[id]);
+
+        delete _private.playersIndex[id];
+        var i = _private.players.length;
+        for (;i--;) {
+            if (_private.players[i]) {
+                if (_private.players[i].id === id) {
+                    delete _private.players[i];
+                    return
+                }
+            }
+        }
+        return
+    };
 
     this.removeBullet = function(bulletIndex) {
         this.game.delEntity(_private.bullets[bulletIndex]);
@@ -88,11 +120,10 @@ var ThunderTanks = function() {
                 });
                 socket.on('remote-player-update', function (data) {
                     // update player
-                    SELF.players[data.id].playerUpdate(data);
+                    _private.playersIndex[data.id].playerUpdate(data);
                 });
                 socket.on('delete-player', function (id) {
-                    SELF.game.delEntity(SELF.players[id]);
-                    delete SELF.players[id];
+                    SELF.removePlayer(id);
                 });
             } else {
                 SELF.addPlayer({id:'demo'}, false);
