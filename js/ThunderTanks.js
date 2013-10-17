@@ -36,6 +36,12 @@ var ThunderTanks = function() {
         // collide bullets and tanks
         collide.aabb(_private.bullets, _private.players);
 
+        // collide tanks and map objects
+        collide.aabb(_private.players, _private.obstacles);
+
+        // collide tanks and tanks
+        collide.aabb(_private.players, _private.players);
+
         return;
     }
 
