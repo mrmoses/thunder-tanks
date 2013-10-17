@@ -6,7 +6,7 @@ var express = require('express')
   , io = require('socket.io').listen(app.listen(port, host));
 
 app.configure(function(){
-  // serve css and js folders as static files
+  // serve css, js, images folders as static files
   app.use('/css', express.static(path.join(__dirname, 'css')));
   app.use('/js', express.static(path.join(__dirname, 'js')));
   app.use('/images', express.static(path.join(__dirname, 'images')));
