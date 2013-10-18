@@ -28,14 +28,14 @@ function Tank(tt, data, remote) {
         fireRate: 5, // number of shots per sec
         fireCooldown: 0,
         remote: remote,
-		tankSprite: new Sprite(["center", "center"], {
-			"still": [['images/tank/tanksprite1.png', 1] , ['images/tank/tanksprite1.png'], 1],
-			"forward": [['images/tank/tanksprite.png', 1] , ['images/tank/tanksprite.png'], 1]
-			},
-			function() {
-				_private.tankSprite.action("still");
-				_private.tankSprite.angle(_private.angle);
-			})
+        tankSprite: new Sprite(["center", "center"], {
+            "still": [['/images/tank/tanksprite1.png', 1] , ['/images/tank/tanksprite1.png'], 1],
+            "forward": [['/images/tank/tanksprite1.png', 1] , ['/images/tank/tanksprite1.png'], 1]
+        },
+        function() {
+            _private.tankSprite.action("still");
+            _private.tankSprite.angle(_private.angle);
+        })
     }
 
     /**
@@ -64,9 +64,9 @@ function Tank(tt, data, remote) {
         if (!_private.remote && typeof socket != 'undefined') {
             socket.emit('client-player-update', this.getData());
         }
-		
-		_private.tankSprite.angle(_private.angle);
-		_private.tankSprite.update();
+
+        _private.tankSprite.angle(_private.angle);
+        _private.tankSprite.update();
     };
 
     /**
@@ -82,8 +82,8 @@ function Tank(tt, data, remote) {
         c.rotate(_private.aimAngle);
         c.fillRect(0, 0, _private.length, 5);
         c.restore();
-		
-		_private.tankSprite.draw(c, [_private.x, _private.y]);
+
+        _private.tankSprite.draw(c, [_private.x, _private.y]);
 
     }
 
