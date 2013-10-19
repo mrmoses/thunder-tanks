@@ -18,7 +18,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
         bounces: 1,
         animation: new Sprite(["center","center"], {
-            "move": [["images/bullet1.png", 7],["images/bullet2.png", 7]]
+            "move": [[SELF.tt.urlPath + '/images/bullet1.png', 7],[SELF.tt.urlPath + '/images/bullet2.png', 7]]
         }, function() {
             _private.animation.action("move");
             _private.animation.angle(_private.angle);
@@ -42,7 +42,16 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.draw = function(c, gs) {
+        // draw bullet
+        c.beginPath();
+        c.arc(_private.x, _private.y, _private.radius + 1, 0, 2 * Math.PI, false);
+        c.lineWidth = 1;
+        c.stroke();
+
+        // draw sprite
+        c.save(); //save the current draw state
         _private.animation.draw(c,[_private.x,_private.y]);
+        c.restore(); //restore the previous draw state
     }
 
     this.kill = function() {

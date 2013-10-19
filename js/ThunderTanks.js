@@ -7,6 +7,9 @@ var ThunderTanks = function() {
     /** @type JSGameSoup */
     this.game;
 
+    /** @type String The URL path (without trailing /) */
+    this.urlPath = window.location.pathname.substr(0, window.location.pathname.length - (/\/$/.test(window.location.pathname) ? 1 : 0));
+
     var _private = {
         /** Players by id **/
         playersIndex: {},

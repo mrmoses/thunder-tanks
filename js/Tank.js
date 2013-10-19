@@ -16,8 +16,8 @@ function Tank(tt, data, remote) {
     this.game = tt.game;
 
     var _private = {
-        length: 40,
-        width: 32,
+        length: 43,
+        width: 36,
         x: data.x || 100,
         y: data.y || 100,
         angle: MathUtil.degreesToRadians(45), // angle in radians
@@ -29,8 +29,8 @@ function Tank(tt, data, remote) {
         fireCooldown: 0,
         remote: remote,
         tankSprite: new Sprite(["center", "center"], {
-            "still": [['/images/tank/tanksprite1.png', 1] , ['/images/tank/tanksprite1.png'], 1],
-            "forward": [['/images/tank/tanksprite1.png', 1] , ['/images/tank/tanksprite1.png'], 1]
+            "still": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png'], 1],
+            "forward": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png'], 1]
         },
         function() {
             _private.tankSprite.action("still");
@@ -75,6 +75,16 @@ function Tank(tt, data, remote) {
      */
     this.draw = function(c, gs) {
         // draw tank
+        c.save(); //save the current draw state
+        c.translate(_private.x,_private.y); //set drawing area to where the tank is
+        c.rotate(_private.angle); //rotate drawing area to tank's angle
+        c.fillRect(-_private.length/2, -_private.width/2, _private.length, _private.width); // draw the tank
+        c.restore(); //restore the previous draw state
+
+        // draw tank sprite
+        c.save(); //save the current draw state
+        _private.tankSprite.draw(c, [_private.x, _private.y]);
+        c.restore(); //restore the previous draw state
 
         // draw cannon
         c.save();
@@ -82,9 +92,6 @@ function Tank(tt, data, remote) {
         c.rotate(_private.aimAngle);
         c.fillRect(0, 0, _private.length, 5);
         c.restore();
-
-        _private.tankSprite.draw(c, [_private.x, _private.y]);
-
     }
 
     // if its not a remote player, add controls
