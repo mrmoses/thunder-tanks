@@ -1,24 +1,44 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>Thunder Tanks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!--<link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">-->
     <link href="css/layout.css" rel="stylesheet" />
 </head>
 <body>
-    <div id="page-container">
+    <div class="container">
+        <div id="session-id" class="pull-right"></div>
         <h1 title="Thunder Tanks! HHOOOOOOO!">Thunder Tanks</h1>
-        <p>
-            Move: W A S D (&#8593; &#8595; &#8592; &#8594;)<br />
-            Fire: Click
-        </p>
+        <section class="well well-sm">
+            <dl id="controls" class="dl-horizontal">
+                <dt>Move</dt>
+                <dd>W A S D (&#8593; &#8592; &#8595; &#8594;)</dd>
+
+                <dt>Fire</dt>
+                <dd>Click</dd>
+
+                <dt>Self Destruct</dt>
+                <dd>Ctrl + X</dd>
+            </dl>
+        </section>
+
+        <div class="alerts text-center">
+        </div>
+
         <div id="game"></div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="js/lib/jquery-2.0.3.min.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/jsgamesoup.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/sprite.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/collisions.js"></script>
     <script src="js/MathUtil.js"></script>
+    <script src="js/Alerts.js"></script>
     <script src="js/Map.js"></script>
     <script src="js/Bullet.js"></script>
     <script src="js/Tank.js"></script>

@@ -10,6 +10,7 @@ app.configure(function(){
   app.use('/css', express.static(path.join(__dirname, 'css')));
   app.use('/js', express.static(path.join(__dirname, 'js')));
   app.use('/images', express.static(path.join(__dirname, 'images')));
+  app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
 });
 
 app.get('/', function(req, res){
@@ -29,11 +30,10 @@ console.log('Listening on port ' + port);
 
 /** Here be multiplayer dragons */
 
-var playerIds = [];
-var players = {};
+var tanks = {};
 
 io.sockets.on('connection', function (socket) {
-  console.log("new player connecting", socket.id);
+  //console.log("new player connecting", socket.id);
 
   new Player(socket);
 });
@@ -48,78 +48,85 @@ function Player(socket) {
     socket: socket
   }
 
-  // when this player is updated, send data to all remotes
-  _private.socket.on('client-player-update', function (data) {
-    //update the players data
-    players[data.id].x = data.x;
-    players[data.id].y = data.y;
-    players[data.id].angle = data.angle;
-    players[data.id].aimAngle = data.aimAngle;
+  var _events = {
+    // when a player is connected
+    connected: function() {
+      // send new player all existing tanks
+      for (var id in tanks) {
+        _private.socket.emit('add-tank', tanks[id]);
+      }
+    },
 
-    //send update to other users
-    _private.socket.broadcast.emit('remote-player-update', players[data.id]);
+    /** When a player's tank is killed, or player is disconnected */
+    removeTank: function() {
+      // delete this tank from server data
+      delete tanks[SELF.id];
+
+      //remove this tank from all remotes
+      _private.socket.broadcast.emit('remove-tank', SELF.id);
+    }
+  }
+
+  // when a player deploys a tank
+  _private.socket.on('add-player-tank', function (data) {
+    //console.log("add-player-tank");
+
+    data.id = _private.socket.id;
+
+    // add tank to server data
+    tanks[data.id] = data;
+
+    //update the tanks data
+    //tanks[data.id].x = data.x;
+    //tanks[data.id].y = data.y;
+    //tanks[data.id].angle = data.angle;
+    //tanks[data.id].aimAngle = data.aimAngle;
+
+    //send update to all players (including the player that added the tank)
+    io.sockets.emit('add-tank', tanks[data.id]);
   });
 
-  // when a player is killed, send data to all remotes
-  _private.socket.on('player-killed', function () {
-    //send update to other users
-    _private.socket.broadcast.emit('delete-player', SELF.id);
+  // when this player is updated, send data to all remote players
+  _private.socket.on('player-tank-update', function (data) {
+    //console.log("player-tank-update", data);
+    //update the server data with the tanks data
+    if (tanks[data.id]) {
+      tanks[data.id].x = data.x;
+      tanks[data.id].y = data.y;
+      tanks[data.id].angle = data.angle;
+      tanks[data.id].aimAngle = data.aimAngle;
+
+      //send update to other players
+      _private.socket.broadcast.emit('remote-tank-update', tanks[data.id]);
+    } else {
+      console.log("tank not found", data.id);
+    }
+  });
+
+  // when a tank is killed, send data to all remotes
+  _private.socket.on('tank-killed', function () {
+    //console.log("tank-killed");
+    _events.removeTank();
   });
 
   // when a player fires a bullet, send data to all remotes
   _private.socket.on('add-bullet', function (data) {
+    //console.log("add-bullet");
     //send update to other users
     _private.socket.broadcast.emit('add-bullet', data);
   });
 
   /* when a player disconnects */
   _private.socket.on('disconnect', function () {
-    console.log("player disconnected " + SELF.id);
-
-    // delete this everywhere it might exist
-    delete players[SELF.id];
-    var spliceLoc = 0;
-    for (var i = 0; i < playerIds.length; i++) {
-      if (playerIds[i] === SELF.id) {
-        spliceLoc = i;
-      }
+    //console.log("player disconnected " + SELF.id);
+    // if this player had a tank, remove it
+    if (tanks[SELF.id]) {
+      _events.removeTank();
     }
-    playerIds.splice(spliceLoc,1);
-
-    console.log("players", players);
-    console.log("playerIds", playerIds);
-
-    //remove this player from all remotes
-    _private.socket.broadcast.emit('delete-player', SELF.id);
   });
-
-  this.getData = function() {
-    return {
-      id: this.id,
-      x: this.x,
-      y: this.y,
-      angle: this.angle,
-      aimAngle: this.aimAngle
-    };
-  };
 
   // init
   (function() {
-    // add player to list of all players
-    playerIds.push(SELF.id);
-    players[SELF.id] = SELF;
-
-    // spawn all players for this player (this player and all remotes)
-    console.log("players", players);
-    console.log("playerIds", playerIds);
-    for (var i = 0; i < playerIds.length; i++) {
-      console.log("adding player");
-      _private.socket.emit('add-player', players[playerIds[i]].getData());
-    }
-
-    //spawn this player on all remotes
-    _private.socket.broadcast.emit('add-player', SELF.getData());
+    _events.connected();
   })();
-
-  return SELF;
 }

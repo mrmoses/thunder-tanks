@@ -1,7 +1,7 @@
 /**
  * @param {ThunderTanks} tt ThunderTanks instace.
- * @param {Object} data players data (id, x, y)
- * @param {Boolean} remote True if the player is a remote player
+ * @param {Object} data  Tank data (id, x, y)
+ * @param {Boolean} remote True if the tank is a remote player
  *
  */
 function Tank(tt, data, remote) {
@@ -61,8 +61,8 @@ function Tank(tt, data, remote) {
             _private.fireCooldown--;
         }
 
-        if (!_private.remote && typeof socket != 'undefined') {
-            socket.emit('client-player-update', this.getData());
+        if (!_private.remote && typeof multiplayerConn != 'undefined') {
+            multiplayerConn.emit('player-tank-update', this.getData());
         }
 
         _private.tankSprite.angle(_private.angle);
@@ -92,6 +92,10 @@ function Tank(tt, data, remote) {
         c.rotate(_private.aimAngle);
         c.fillRect(0, 0, _private.length, 5);
         c.restore();
+
+        c.fillRect(_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width);
+
+
     }
 
     // if its not a remote player, add controls
@@ -132,11 +136,29 @@ function Tank(tt, data, remote) {
             _private.angle += 0.1;
         }
 
+        // Ctrl
+        this.keyDown_17 = function() {
+            _private.ctrlkey = true;
+        }
+        this.keyUp_17 = function() {
+            _private.ctrlkey = false;
+        }
+
+        // X
+        this.keyUp_88 = function() {
+            // Ctrl + X = self destruct
+            if (_private.ctrlkey) {
+                SELF.kill();
+            }
+        }
+
         this.keyDown = function (keyCode) {
             //console.log(keyCode);
 
             // w = 87, s = 83, a = 65, d = 68
             // up = 38, down = 40, left = 37, right = 39
+            // Ctrl = 17
+            // X = 88
         }
 
         this.pointerBox = function() {
@@ -177,8 +199,8 @@ function Tank(tt, data, remote) {
             tt.addBullet(barrelTipX,barrelTipY,mousex,mousey);
 
             // send bullets to remote players
-            if (!_private.remote && typeof socket != 'undefined') {
-                socket.emit('add-bullet', {
+            if (!_private.remote && typeof multiplayerConn != 'undefined') {
+                multiplayerConn.emit('add-bullet', {
                     startx: barrelTipX,
                     starty: barrelTipY,
                     targetx: mousex,
@@ -188,8 +210,8 @@ function Tank(tt, data, remote) {
         }
     }
 
-    /** Used to update remote players */
-    this.playerUpdate = function(data) {
+    /** Used to update remote tanks */
+    this.remoteUpdate = function(data) {
         _private.x = data.x;
         _private.y = data.y;
         _private.angle = data.angle;
@@ -207,15 +229,12 @@ function Tank(tt, data, remote) {
     }
 
     this.kill = function() {
-        this.tt.removePlayer(SELF.id);
-        if (!_private.remote) {
-            alert("You dead!");
+        this.tt.removeTank(SELF.id);
+    }
 
-            // remove this player from all remotes
-            if (typeof socket != 'undefined') {
-                socket.emit('player-killed');
-            }
-        }
+    /** True if this is a remote player's tank */
+    this.isRemote = function() {
+        return _private.remote;
     }
 
     /* @returns[Array] a rectangle of the boundaries of the entity with the form [x, y, w, h] */
@@ -226,7 +245,9 @@ function Tank(tt, data, remote) {
     this.collide_aabb = function(entity, result) {
         //console.log('Tank collide_aabb', entity, result);
         if (entity instanceof Bullet) {
-            SELF.kill();
+            if (typeof multiplayerConn === 'undefined' || !_private.remote) {
+                SELF.kill();
+            }
         } else if (entity instanceof Block || entity instanceof Tank) {
             _private.speed = 0;
         }

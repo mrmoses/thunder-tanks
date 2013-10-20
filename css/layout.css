@@ -1,12 +1,21 @@
-#page-container {
-	width: 970px;
-	margin: 0 auto;
+#controls {
+	margin: 0;
+}
+
+.alerts {
+	height: 70px;
+	overflow: hidden;
+}
+
+#session-id {
+	color: #F9F9F9;
+}
+#session-id:hover {
+	color: #000000;
 }
 
 #game {
 	width: 970px;
 	height: 546px; /* 16:9 */
-	
-	margin: 0 auto;
 	border: #000 solid 1px;
 }
