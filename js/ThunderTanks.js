@@ -1,5 +1,10 @@
 if (typeof io != 'undefined') {
-    var socket = io.connect();
+    var multiplayerConn = io.connect();
+    multiplayerConn.on('connect', function() {
+        console.log("connected to multiplayer server");
+        $('#session-id').text(multiplayerConn.socket.sessionid);
+        tt.alerts.connected();
+    });
 }
 var ThunderTanks = function() {
     var SELF = this;
@@ -11,17 +16,18 @@ var ThunderTanks = function() {
     this.urlPath = window.location.pathname.substr(0, window.location.pathname.length - (/\/$/.test(window.location.pathname) ? 1 : 0));
 
     var _private = {
-        /** Players by id **/
-        playersIndex: {},
+        /** Tanks by id **/
+        tanks: {},
 
-        /** @type Array Players array. */
-        players: [],
+        tankArray: [],
 
         /** @type Array */
         obstacles: [],
 
         /** @type Array */
-        bullets: []
+        bullets: [],
+
+        playerTankDeployed: false
     };
 
     /**
@@ -37,26 +43,29 @@ var ThunderTanks = function() {
         collide.circles(_private.bullets, _private.bullets);
 
         // collide bullets and tanks
-        collide.aabb(_private.bullets, _private.players);
+        collide.aabb(_private.bullets, _private.tankArray);
+
 
         // collide tanks and map objects
-        collide.aabb(_private.players, _private.obstacles);
+        collide.aabb(_private.tankArray, _private.obstacles);
 
         // collide tanks and tanks
-        collide.aabb(_private.players, _private.players);
+        //collide.aabb(_private.tankArray, _private.tankArray);
 
         return;
     }
 
+    this.alerts = new Alerts();
+
     /**
-     * @param {Object} data The players data (id, x, y)
-     * @param {Boolean} remote True if the player is a remote player
+     * @param {Object} data  The tanks data (id, x, y)
+     * @param {Boolean} remote  True if the tanks is a remote tanks
      */
-    this.addPlayer = function(data, remote) {
-        _private.playersIndex[data.id] = new Tank(this, data, remote);
-        _private.players.push(_private.playersIndex[data.id]);
-        this.game.addEntity(_private.playersIndex[data.id]);
-        return _private.playersIndex[data.id];
+    this.addTank = function(data, remote) {
+        _private.tanks[data.id] = new Tank(this, data, remote);
+        _private.tankArray = $.map(_private.tanks, function(value,index) { return value;})
+        this.game.addEntity(_private.tanks[data.id]);
+        return _private.tanks[data.id];
     }
 
     this.addMap = function() {
@@ -86,25 +95,60 @@ var ThunderTanks = function() {
         return b;
     }
 
-    this.removePlayer = function(id) {
-        this.game.delEntity(_private.playersIndex[id]);
+    this.removeTank = function(id) {
+        var tank = _private.tanks[id];
 
-        delete _private.playersIndex[id];
-        var i = _private.players.length;
-        for (;i--;) {
-            if (_private.players[i]) {
-                if (_private.players[i].id === id) {
-                    delete _private.players[i];
-                    return
-                }
+        // remove the tank from the game
+        this.game.delEntity(tank);
+        delete _private.tanks[id];
+        _private.tankArray = $.map(_private.tanks, function(value,index) { return value;});
+
+        // if this was not a remote tank
+        if (!tank.isRemote()) {
+            // show alert
+            SELF.alerts.killed();
+            _private.playerTankDeployed = false;
+
+            // tell server this tank is dead
+            if (typeof multiplayerConn != 'undefined') {
+                multiplayerConn.emit('tank-killed');
             }
         }
+
         return
     };
 
     this.removeBullet = function(bulletIndex) {
         this.game.delEntity(_private.bullets[bulletIndex]);
         delete _private.bullets[bulletIndex];
+    };
+
+    // defines clickable area
+    this.pointerBox = function() {
+        return [0, 0, this.game.width, this.game.height];
+    }
+
+    this.pointerDown = function(button) {
+        if (!_private.playerTankDeployed) {
+            _private.playerTankDeployed = true;
+            var mouseposition = this.game.pointerPosition,
+                mousex = mouseposition[0],
+                mousey = mouseposition[1];
+
+            switch (button) {
+                case 0:
+                    if (typeof multiplayerConn != 'undefined') {
+                        multiplayerConn.emit('add-player-tank', {x: mousex, y:mousey});
+                    } else {
+                        SELF.addTank({id: 'player', x: mousex, y:mousey}, false);
+                    }
+                    break;
+                case 2:
+                    break;
+            }
+
+            SELF.alerts.clear();
+        }
     };
 
     // init
@@ -122,27 +166,33 @@ var ThunderTanks = function() {
             // launch the game
             SELF.game.launch();
 
-            if (typeof socket != 'undefined') {
-                socket.on('add-player', function (data) {
-                    // add player
-                    SELF.addPlayer(data, data.id !== socket.socket.sessionid);
+            if (typeof multiplayerConn != 'undefined') {
+                multiplayerConn.on('add-tank', function (data) {
+                    var isRemote = data.id !== multiplayerConn.socket.sessionid;
+                    // local player tank
+                    if (isRemote) {
+                        SELF.addTank(data, isRemote);
+                    } else {
+                        SELF.addTank(data, isRemote);
+                    }
                 });
-                socket.on('add-bullet', function (data) {
+                multiplayerConn.on('add-bullet', function (data) {
                     // add bullet
                     SELF.addBullet(data.startx, data.starty, data.targetx, data.targety);
                 });
-                socket.on('remote-player-update', function (data) {
-                    // update player
-                    _private.playersIndex[data.id].playerUpdate(data);
+                multiplayerConn.on('remote-tank-update', function (data) {
+                    // update tank
+                    _private.tanks[data.id].remoteUpdate(data);
                 });
-                socket.on('delete-player', function (id) {
-                    SELF.removePlayer(id);
+                multiplayerConn.on('remove-tank', function (id) {
+                    SELF.removeTank(id);
                 });
             } else {
-                SELF.addPlayer({id:'demo', x: 100, y: 100}, false);
+                tt.alerts.addAlert('info','Click anywhere to deploy a tank.');
+                //SELF.addTank({id:'demo', x: 100, y: 100}, false);
 
                 // enemy in the opposite corner
-                SELF.addPlayer({id:'enemy1', x: SELF.game.width - 100, y: SELF.game.height - 100}, true);
+                SELF.addTank({id:'enemy1', x: SELF.game.width - 100, y: SELF.game.height - 100}, true);
 
                 /** Target Practice
                 for (var x = 50; x <= 500; x+=100){
