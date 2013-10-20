@@ -20,7 +20,8 @@ function Tank(tt, data, remote) {
         width: 36,
         x: data.x || 100,
         y: data.y || 100,
-        angle: MathUtil.degreesToRadians(45), // angle in radians
+        angle: 0, // angle in radians
+        poly: [], // array of points that (corners of the tank)
         speed: 0,
         maxSpeed: 4,
         aimAngle: MathUtil.degreesToRadians(0),
@@ -42,9 +43,45 @@ function Tank(tt, data, remote) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
+        // these calculation are used a lot, so its done once here
+        var cosA = Math.cos(_private.angle);
+        var sinA = Math.sin(_private.angle);
+
         // move tank
-        _private.x = _private.x + _private.speed * Math.cos(_private.angle);
-        _private.y = _private.y + _private.speed * Math.sin(_private.angle);
+        _private.x = _private.x + _private.speed * cosA;
+        _private.y = _private.y + _private.speed * sinA;
+
+        // more calculations that are reused, so they are calculated once here
+        var LcosA = _private.length/2 * cosA;
+        var LsinA = _private.length/2 * sinA;
+        var WcosA = _private.width/2 * cosA;
+        var WsinA = _private.width/2 * sinA;
+
+        // recalculate corners
+        _private.frontX = _private.x + LcosA;
+        _private.frontY = _private.y + WsinA;
+        _private.backX = _private.x - LcosA;
+        _private.backY = _private.y - WsinA;
+        _private.leftX = (_private.x) + WsinA;
+        _private.leftY = (_private.y) - WcosA;
+        _private.rightX = (_private.x) - WsinA;
+        _private.rightY = (_private.y) + WcosA;
+        _private.corner1x = _private.leftX - LcosA;
+        _private.corner1y = _private.leftY - LsinA;
+        _private.corner2x = _private.leftX + LcosA;
+        _private.corner2y = _private.leftY + LsinA;
+        _private.corner3x = _private.rightX + LcosA;
+        _private.corner3y = _private.rightY + LsinA;
+        _private.corner4x = _private.rightX - LcosA;
+        _private.corner4y = _private.rightY - LsinA;
+
+        // update poly points
+        _private.poly = [
+            [_private.corner1x,_private.corner1y],
+            [_private.corner2x,_private.corner2y],
+            [_private.corner3x,_private.corner3y],
+            [_private.corner4x,_private.corner4y]
+        ];
 
         if (!_private.remote) {
             // update aim
@@ -74,7 +111,8 @@ function Tank(tt, data, remote) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.draw = function(c, gs) {
-        // draw tank
+
+        // draw rectangle (tank "shadow" if sprite loads slowly)
         c.save(); //save the current draw state
         c.translate(_private.x,_private.y); //set drawing area to where the tank is
         c.rotate(_private.angle); //rotate drawing area to tank's angle
@@ -92,6 +130,82 @@ function Tank(tt, data, remote) {
         c.rotate(_private.aimAngle);
         c.fillRect(0, 0, _private.length, 5);
         c.restore();
+
+
+        /** The rest of this draw function is used for debugging */
+
+        //// draw aabb collision box
+        //c.fillStyle = '#ff00ff';
+        //c.fillRect(_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width);
+
+        //// draw circle collision box
+        //var aSqrd = (_private.length*_private.length)/4;
+        //var bSqrd = (_private.width*_private.width)/4;
+        //// equals c squared
+        //var radius = Math.sqrt(aSqrd+bSqrd);
+        //c.fillStyle = '#ff00ff';
+        //c.beginPath();
+        //c.arc(_private.x, _private.y, radius, 0, 2 * Math.PI, false);
+        //c.fill();
+
+        //// draw polygon collision box
+        //c.fillStyle = '#ff00ff';
+        //c.beginPath();
+        //c.moveTo(_private.poly[0][0],_private.poly[0][1]);
+        //for(var i = 1; i < _private.poly.length; i++) {
+        //    c.lineTo(_private.poly[i][0],_private.poly[i][1]);
+        //}
+        //c.closePath();
+        //c.fill();
+
+        //// front circle
+        //c.beginPath();
+        //c.strokeStyle = "#00FF00";
+        //c.arc(_private.frontX, _private.frontY, 10, 0, 2 * Math.PI, false);
+        //c.stroke();
+        //
+        //// back circle
+        //c.beginPath();
+        //c.strokeStyle = "#FF0000";
+        //c.arc(_private.backX, _private.backY, 10, 0, 2 * Math.PI, false);
+        //c.lineWidth = 1;
+        //c.stroke();
+        //
+        //// left side circle
+        //c.beginPath();
+        //c.strokeStyle = "#FFFF00";
+        //c.arc(_private.leftX, _private.leftY, 3, 0, 2 * Math.PI, false);
+        //c.stroke();
+        //
+        //// right side circle
+        //c.beginPath();
+        //c.strokeStyle = "#00FFFF";
+        //c.arc(_private.rightX, _private.rightY, 3, 0, 2 * Math.PI, false);
+        //c.stroke();
+        //
+        //// corern 1 circle
+        //c.beginPath();
+        //c.strokeStyle = "#ff00ff";
+        //c.arc(_private.corner1x, _private.corner1y, 3, 0, 2 * Math.PI, false);
+        //c.stroke();
+        //
+        //// corner 2 circle
+        //c.beginPath();
+        //c.strokeStyle = "#ff00ff";
+        //c.arc(_private.corner2x, _private.corner2y, 3, 0, 2 * Math.PI, false);
+        //c.stroke();
+        //
+        //// corner 3 circle
+        //c.beginPath();
+        //c.strokeStyle = "#ff00ff";
+        //c.arc(_private.corner3x, _private.corner3y, 3, 0, 2 * Math.PI, false);
+        //c.stroke();
+        //
+        //// corner 4 circle
+        //c.beginPath();
+        //c.strokeStyle = "#ff00ff";
+        //c.arc(_private.corner4x, _private.corner4y, 3, 0, 2 * Math.PI, false);
+        //c.stroke();
     }
 
     // if its not a remote player, add controls
@@ -233,9 +347,23 @@ function Tank(tt, data, remote) {
         return _private.remote;
     }
 
-    /* @returns[Array] a rectangle of the boundaries of the entity with the form [x, y, w, h] */
+    /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
     this.get_collision_aabb = function() {
         return [_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width];
+    }
+
+    /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
+    this.get_collision_circle = function() {
+        var aSqrd = (_private.length*_private.length)/4;
+        var bSqrd = (_private.width*_private.width)/4;
+        // equals c squared
+        var radius = Math.sqrt(aSqrd+bSqrd);
+        return [[_private.x,_private.y], radius];
+    }
+
+    /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
+    this.get_collision_poly = function() {
+        return _private.poly;
     }
 
     this.collide_aabb = function(entity, result) {

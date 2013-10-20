@@ -4,7 +4,10 @@ function Alerts() {
     var _private = {
         killedMessages: [
             '<strong>You dead.</strong> Click anywhere to deploy another tank.',
-            '<strong>Kablam!</strong> Elimination; lack of education. Click anywhere to deploy another tank.'
+            '<strong>Kablam!</strong> Elimination; lack of education. Click anywhere to deploy another tank.',
+            '<strong>You got got!</strong> Click anywhere to deploy another tank.',
+            '<strong>Dead Place!</strong> Click anywhere to deploy another tank and try again.',
+            '<strong>Hasta la bye bye.</strong> Your tank was destroyed. Click anywhere to deploy another tank.'
         ]
     }
 

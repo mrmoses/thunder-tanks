@@ -43,14 +43,43 @@ function Map(tt) {
 }
 
 function Block(x,y,w,h) {
+    var SELF = this;
+
+    var _private = {
+        leftX: x,
+        topY: y,
+        width: w,
+        length: h,
+        poly: [
+            [x,y],
+            [x+w,y],
+            [x+w,y+h],
+            [x,y+h]
+        ]
+    }
+
     this.draw = function(c, gs) {
         // draw block
 	c.fillStyle = 'rgba(200, 200, 200, 1.0)';
-        c.fillRect(x, y, w, h);
+        c.fillRect(_private.leftX, _private.topY, _private.width, _private.length);
     }
 
-    /* @returns[Array] a rectangle of the boundaries of the entity with the form [x, y, w, h] */
+    /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
     this.get_collision_aabb = function() {
-        return [x,y,w,h];
+        return [_private.leftX,_private.topY,_private.width,_private.length];
+    }
+
+    /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
+    this.get_collision_circle = function() {
+        var aSqrd = (_private.length*_private.length)/4;
+        var bSqrd = (_private.width*_private.width)/4;
+        // equals c squared
+        var radius = Math.sqrt(aSqrd+bSqrd);
+        return [[_private.leftx,_private.topY], radius];
+    }
+
+    /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
+    this.get_collision_poly = function() {
+        return _private.poly;
     }
 }
