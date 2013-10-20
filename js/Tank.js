@@ -92,10 +92,6 @@ function Tank(tt, data, remote) {
         c.rotate(_private.aimAngle);
         c.fillRect(0, 0, _private.length, 5);
         c.restore();
-
-        c.fillRect(_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width);
-
-
     }
 
     // if its not a remote player, add controls
