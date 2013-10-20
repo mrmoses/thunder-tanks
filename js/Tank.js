@@ -20,7 +20,7 @@ function Tank(tt, data, remote) {
         width: 36,
         x: data.x || 100,
         y: data.y || 100,
-        angle: MathUtil.degreesToRadians(45), // angle in radians
+        angle: 0, // angle in radians
         speed: 0,
         maxSpeed: 4,
         aimAngle: MathUtil.degreesToRadians(0),
