@@ -24,6 +24,8 @@ function Tank(tt, data, remote) {
         poly: [], // array of points that (corners of the tank)
         speed: 0,
         maxSpeed: 4,
+        turnSpeed: 0,
+        maxTurnSpeed: 0.1,
         aimAngle: MathUtil.degreesToRadians(0),
         firing: false,
         fireRate: 5, // number of shots per sec
@@ -43,6 +45,8 @@ function Tank(tt, data, remote) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
+        _private.angle += _private.turnSpeed;
+
         // these calculation are used a lot, so its done once here
         var cosA = Math.cos(_private.angle);
         var sinA = Math.sin(_private.angle);
@@ -238,13 +242,17 @@ function Tank(tt, data, remote) {
 
         // left (A)
         this.keyHeld_37 = this.keyDown_37 = this.keyHeld_65 = this.keyDown_65 = function () {
-            _private.angle -= 0.1;
-
+            _private.turnSpeed = _private.maxTurnSpeed * -1;
         }
 
         // right (D)
         this.keyHeld_39 = this.keyDown_39 = this.keyHeld_68 = this.keyDown_68 = function () {
-            _private.angle += 0.1;
+            _private.turnSpeed = _private.maxTurnSpeed;
+        }
+
+        // left (A) and right ()wa
+        this.keyUp_37 = this.keyUp_65 = this.keyUp_39 = this.keyUp_68 = function () {
+            _private.turnSpeed = 0;
         }
 
         // Ctrl
