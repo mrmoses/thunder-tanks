@@ -381,13 +381,19 @@ function Tank(tt, data, remote) {
     }
 
     this.collide_aabb = function(entity, result) {
-        //console.log('Tank collide_aabb', entity, result);
         if (entity instanceof Bullet) {
             if (typeof multiplayerConn === 'undefined' || !_private.remote) {
                 SELF.kill();
             }
         } else if (entity instanceof Block || entity instanceof Tank) {
-            _private.speed = 0;
+            // for some reason tanks are getting collision checks before they have dimensions, which causes errors
+            if(this.get_collision_poly().length) {
+                var polycollision = collide.collide_poly_entities(this,entity);
+                if (polycollision) {
+                    _private.speed = 0;
+                    //_private.turnSpeed = 0;
+                }
+            }
         }
     }
 
