@@ -358,7 +358,12 @@ function Tank(tt, data, remote) {
 
     /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
     this.get_collision_aabb = function() {
-        return [_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width];
+        var minX = Math.min(_private.corner1x, _private.corner2x, _private.corner3x, _private.corner4x);
+        var minY = Math.min(_private.corner1y, _private.corner2y, _private.corner3y, _private.corner4y);
+        var maxX = Math.max(_private.corner1x, _private.corner2x, _private.corner3x, _private.corner4x);
+        var maxY = Math.max(_private.corner1y, _private.corner2y, _private.corner3y, _private.corner4y);
+
+        return [minX, minY, maxX - minX, maxY - minY];
     }
 
     /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
