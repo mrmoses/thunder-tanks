@@ -24,25 +24,36 @@ function Tank(tt, data, remote) {
         poly: [], // array of points that (corners of the tank)
         speed: 0,
         maxSpeed: 4,
+        turnSpeed: 0,
+        maxTurnSpeed: 0.1,
         aimAngle: MathUtil.degreesToRadians(0),
         firing: false,
         fireRate: 5, // number of shots per sec
         fireCooldown: 0,
         remote: remote,
         tankSprite: new Sprite(["center", "center"], {
-            "still": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png'], 1],
-            "forward": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png'], 1]
+            "still": [[SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png', 1] , [SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png'], 1],
+            "forward": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1]]
         },
         function() {
             _private.tankSprite.action("still");
             _private.tankSprite.angle(_private.angle);
-        })
+        }),
+		turretSprite: new Sprite(["center", "center"], {
+			"still": [[SELF.tt.urlPath + '/images/tank/turret.png', 1] , [SELF.tt.urlPath + '/images/tank/turret.png', 1]]
+		},
+		function() {
+		    _private.turretSprite.action("still");
+            _private.turretSprite.angle(_private.aimAngle);
+		}),
     }
 
     /**
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
+        _private.angle += _private.turnSpeed;
+
         // these calculation are used a lot, so its done once here
         var cosA = Math.cos(_private.angle);
         var sinA = Math.sin(_private.angle);
@@ -113,11 +124,11 @@ function Tank(tt, data, remote) {
     this.draw = function(c, gs) {
 
         // draw rectangle (tank "shadow" if sprite loads slowly)
-        c.save(); //save the current draw state
+      /*  c.save(); //save the current draw state
         c.translate(_private.x,_private.y); //set drawing area to where the tank is
         c.rotate(_private.angle); //rotate drawing area to tank's angle
         c.fillRect(-_private.length/2, -_private.width/2, _private.length, _private.width); // draw the tank
-        c.restore(); //restore the previous draw state
+        c.restore(); //restore the previous draw state		*/
 
         // draw tank sprite
         c.save(); //save the current draw state
@@ -128,84 +139,86 @@ function Tank(tt, data, remote) {
         c.save();
         c.translate(_private.x,_private.y);
         c.rotate(_private.aimAngle);
-        c.fillRect(0, 0, _private.length, 5);
-        c.restore();
 
-
+		_private.turretSprite.draw(c, [0 , 0]);
+		c.restore(); //restore the previous draw state
+		
         /** The rest of this draw function is used for debugging */
+        if (this.tt.debug) {
+            c.lineWidth = 1;
 
-        //// draw aabb collision box
-        //c.fillStyle = '#ff00ff';
-        //c.fillRect(_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width);
+            // draw aabb collision box
+            var aabb = this.get_collision_aabb();
+            c.strokeStyle = '#ff0000';
+            c.rect(aabb[0], aabb[1], aabb[2], aabb[3]);
+            c.stroke();
 
-        //// draw circle collision box
-        //var aSqrd = (_private.length*_private.length)/4;
-        //var bSqrd = (_private.width*_private.width)/4;
-        //// equals c squared
-        //var radius = Math.sqrt(aSqrd+bSqrd);
-        //c.fillStyle = '#ff00ff';
-        //c.beginPath();
-        //c.arc(_private.x, _private.y, radius, 0, 2 * Math.PI, false);
-        //c.fill();
+            // draw circle collision box
+            var circle = this.get_collision_circle();
+            c.strokeStyle = '#0000ff';
+            c.beginPath();
+            c.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
+            c.stroke();
 
-        //// draw polygon collision box
-        //c.fillStyle = '#ff00ff';
-        //c.beginPath();
-        //c.moveTo(_private.poly[0][0],_private.poly[0][1]);
-        //for(var i = 1; i < _private.poly.length; i++) {
-        //    c.lineTo(_private.poly[i][0],_private.poly[i][1]);
-        //}
-        //c.closePath();
-        //c.fill();
+            // draw polygon collision box
+            c.strokeStyle = '#ff00ff';
+            c.beginPath();
+            c.moveTo(_private.poly[0][0],_private.poly[0][1]);
+            for(var i = 1; i < _private.poly.length; i++) {
+                c.lineTo(_private.poly[i][0],_private.poly[i][1]);
+            }
+            c.closePath();
+            c.stroke();
 
-        //// front circle
-        //c.beginPath();
-        //c.strokeStyle = "#00FF00";
-        //c.arc(_private.frontX, _private.frontY, 10, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// back circle
-        //c.beginPath();
-        //c.strokeStyle = "#FF0000";
-        //c.arc(_private.backX, _private.backY, 10, 0, 2 * Math.PI, false);
-        //c.lineWidth = 1;
-        //c.stroke();
-        //
-        //// left side circle
-        //c.beginPath();
-        //c.strokeStyle = "#FFFF00";
-        //c.arc(_private.leftX, _private.leftY, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// right side circle
-        //c.beginPath();
-        //c.strokeStyle = "#00FFFF";
-        //c.arc(_private.rightX, _private.rightY, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corern 1 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner1x, _private.corner1y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corner 2 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner2x, _private.corner2y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corner 3 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner3x, _private.corner3y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corner 4 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner4x, _private.corner4y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
+            // front circle
+            c.beginPath();
+            c.strokeStyle = "#00FF00";
+            c.arc(_private.frontX, _private.frontY, 10, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // back circle
+            c.beginPath();
+            c.strokeStyle = "#FF0000";
+            c.arc(_private.backX, _private.backY, 10, 0, 2 * Math.PI, false);
+            c.lineWidth = 1;
+            c.stroke();
+
+            // left side circle
+            c.beginPath();
+            c.strokeStyle = "#FFFF00";
+            c.arc(_private.leftX, _private.leftY, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // right side circle
+            c.beginPath();
+            c.strokeStyle = "#00FFFF";
+            c.arc(_private.rightX, _private.rightY, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corern 1 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner1x, _private.corner1y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corner 2 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner2x, _private.corner2y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corner 3 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner3x, _private.corner3y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corner 4 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner4x, _private.corner4y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+        }
     }
 
     // if its not a remote player, add controls
@@ -237,13 +250,17 @@ function Tank(tt, data, remote) {
 
         // left (A)
         this.keyHeld_37 = this.keyDown_37 = this.keyHeld_65 = this.keyDown_65 = function () {
-            _private.angle -= 0.1;
-
+            _private.turnSpeed = _private.maxTurnSpeed * -1;
         }
 
         // right (D)
         this.keyHeld_39 = this.keyDown_39 = this.keyHeld_68 = this.keyDown_68 = function () {
-            _private.angle += 0.1;
+            _private.turnSpeed = _private.maxTurnSpeed;
+        }
+
+        // left (A) and right ()wa
+        this.keyUp_37 = this.keyUp_65 = this.keyUp_39 = this.keyUp_68 = function () {
+            _private.turnSpeed = 0;
         }
 
         // Ctrl
@@ -349,7 +366,12 @@ function Tank(tt, data, remote) {
 
     /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
     this.get_collision_aabb = function() {
-        return [_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width];
+        var minX = Math.min(_private.corner1x, _private.corner2x, _private.corner3x, _private.corner4x);
+        var minY = Math.min(_private.corner1y, _private.corner2y, _private.corner3y, _private.corner4y);
+        var maxX = Math.max(_private.corner1x, _private.corner2x, _private.corner3x, _private.corner4x);
+        var maxY = Math.max(_private.corner1y, _private.corner2y, _private.corner3y, _private.corner4y);
+
+        return [minX, minY, maxX - minX, maxY - minY];
     }
 
     /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
@@ -367,13 +389,19 @@ function Tank(tt, data, remote) {
     }
 
     this.collide_aabb = function(entity, result) {
-        //console.log('Tank collide_aabb', entity, result);
         if (entity instanceof Bullet) {
             if (typeof multiplayerConn === 'undefined' || !_private.remote) {
                 SELF.kill();
             }
         } else if (entity instanceof Block || entity instanceof Tank) {
-            _private.speed = 0;
+            // for some reason tanks are getting collision checks before they have dimensions, which causes errors
+            if(this.get_collision_poly().length) {
+                var polycollision = collide.collide_poly_entities(this,entity);
+                if (polycollision) {
+                    _private.speed = 0;
+                    //_private.turnSpeed = 0;
+                }
+            }
         }
     }
 
