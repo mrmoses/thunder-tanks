@@ -62,6 +62,36 @@ function Block(x,y,w,h) {
         // draw block
 	c.fillStyle = 'rgba(200, 200, 200, 1.0)';
         c.fillRect(_private.leftX, _private.topY, _private.width, _private.length);
+
+
+
+        /** The rest of this draw function is used for debugging */
+        if (tt.debug) {
+            c.lineWidth = 1;
+
+            // draw aabb collision box
+            var aabb = this.get_collision_aabb();
+            c.strokeStyle = '#ff0000';
+            c.rect(aabb[0], aabb[1], aabb[2], aabb[3]);
+            //c.stroke();
+
+            // draw circle collision box
+            var circle = this.get_collision_circle();
+            c.strokeStyle = '#0000ff';
+            c.beginPath();
+            c.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // draw polygon collision box
+            c.strokeStyle = '#ff00ff';
+            c.beginPath();
+            c.moveTo(_private.poly[0][0],_private.poly[0][1]);
+            for(var i = 1; i < _private.poly.length; i++) {
+                c.lineTo(_private.poly[i][0],_private.poly[i][1]);
+            }
+            c.closePath();
+            c.stroke();
+        }
     }
 
     /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */

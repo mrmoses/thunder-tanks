@@ -15,6 +15,9 @@ var ThunderTanks = function() {
     /** @type String The URL path (without trailing /) */
     this.urlPath = window.location.pathname.substr(0, window.location.pathname.length - (/\/$/.test(window.location.pathname) ? 1 : 0));
 
+    // draws collision boundaries
+    this.debug = false;
+
     var _private = {
         /** Tanks by id **/
         tanks: {},
