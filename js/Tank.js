@@ -131,81 +131,82 @@ function Tank(tt, data, remote) {
         c.fillRect(0, 0, _private.length, 5);
         c.restore();
 
-
         /** The rest of this draw function is used for debugging */
+        if (this.tt.debug) {
+            c.lineWidth = 1;
 
-        //// draw aabb collision box
-        //c.fillStyle = '#ff00ff';
-        //c.fillRect(_private.x - _private.length/2, _private.y - _private.width/2, _private.length, _private.width);
+            // draw aabb collision box
+            var aabb = this.get_collision_aabb();
+            c.strokeStyle = '#ff0000';
+            c.rect(aabb[0], aabb[1], aabb[2], aabb[3]);
+            c.stroke();
 
-        //// draw circle collision box
-        //var aSqrd = (_private.length*_private.length)/4;
-        //var bSqrd = (_private.width*_private.width)/4;
-        //// equals c squared
-        //var radius = Math.sqrt(aSqrd+bSqrd);
-        //c.fillStyle = '#ff00ff';
-        //c.beginPath();
-        //c.arc(_private.x, _private.y, radius, 0, 2 * Math.PI, false);
-        //c.fill();
+            // draw circle collision box
+            var circle = this.get_collision_circle();
+            c.strokeStyle = '#0000ff';
+            c.beginPath();
+            c.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
+            c.stroke();
 
-        //// draw polygon collision box
-        //c.fillStyle = '#ff00ff';
-        //c.beginPath();
-        //c.moveTo(_private.poly[0][0],_private.poly[0][1]);
-        //for(var i = 1; i < _private.poly.length; i++) {
-        //    c.lineTo(_private.poly[i][0],_private.poly[i][1]);
-        //}
-        //c.closePath();
-        //c.fill();
+            // draw polygon collision box
+            c.strokeStyle = '#ff00ff';
+            c.beginPath();
+            c.moveTo(_private.poly[0][0],_private.poly[0][1]);
+            for(var i = 1; i < _private.poly.length; i++) {
+                c.lineTo(_private.poly[i][0],_private.poly[i][1]);
+            }
+            c.closePath();
+            c.stroke();
 
-        //// front circle
-        //c.beginPath();
-        //c.strokeStyle = "#00FF00";
-        //c.arc(_private.frontX, _private.frontY, 10, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// back circle
-        //c.beginPath();
-        //c.strokeStyle = "#FF0000";
-        //c.arc(_private.backX, _private.backY, 10, 0, 2 * Math.PI, false);
-        //c.lineWidth = 1;
-        //c.stroke();
-        //
-        //// left side circle
-        //c.beginPath();
-        //c.strokeStyle = "#FFFF00";
-        //c.arc(_private.leftX, _private.leftY, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// right side circle
-        //c.beginPath();
-        //c.strokeStyle = "#00FFFF";
-        //c.arc(_private.rightX, _private.rightY, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corern 1 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner1x, _private.corner1y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corner 2 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner2x, _private.corner2y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corner 3 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner3x, _private.corner3y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
-        //
-        //// corner 4 circle
-        //c.beginPath();
-        //c.strokeStyle = "#ff00ff";
-        //c.arc(_private.corner4x, _private.corner4y, 3, 0, 2 * Math.PI, false);
-        //c.stroke();
+            // front circle
+            c.beginPath();
+            c.strokeStyle = "#00FF00";
+            c.arc(_private.frontX, _private.frontY, 10, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // back circle
+            c.beginPath();
+            c.strokeStyle = "#FF0000";
+            c.arc(_private.backX, _private.backY, 10, 0, 2 * Math.PI, false);
+            c.lineWidth = 1;
+            c.stroke();
+
+            // left side circle
+            c.beginPath();
+            c.strokeStyle = "#FFFF00";
+            c.arc(_private.leftX, _private.leftY, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // right side circle
+            c.beginPath();
+            c.strokeStyle = "#00FFFF";
+            c.arc(_private.rightX, _private.rightY, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corern 1 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner1x, _private.corner1y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corner 2 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner2x, _private.corner2y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corner 3 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner3x, _private.corner3y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+
+            // corner 4 circle
+            c.beginPath();
+            c.strokeStyle = "#ff00ff";
+            c.arc(_private.corner4x, _private.corner4y, 3, 0, 2 * Math.PI, false);
+            c.stroke();
+        }
     }
 
     // if its not a remote player, add controls
