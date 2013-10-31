@@ -30,13 +30,20 @@ function Tank(tt, data, remote) {
         fireCooldown: 0,
         remote: remote,
         tankSprite: new Sprite(["center", "center"], {
-            "still": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png'], 1],
-            "forward": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png'], 1]
+            "still": [[SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png', 1] , [SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png'], 1],
+            "forward": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1]]
         },
         function() {
             _private.tankSprite.action("still");
             _private.tankSprite.angle(_private.angle);
-        })
+        }),
+		turretSprite: new Sprite(["center", "center"], {
+			"still": [[SELF.tt.urlPath + '/images/tank/turret.png', 1] , [SELF.tt.urlPath + '/images/tank/turret.png', 1]]
+		},
+		function() {
+		    _private.turretSprite.action("still");
+            _private.turretSprite.angle(_private.aimAngle);
+		}),
     }
 
     /**
@@ -113,11 +120,11 @@ function Tank(tt, data, remote) {
     this.draw = function(c, gs) {
 
         // draw rectangle (tank "shadow" if sprite loads slowly)
-        c.save(); //save the current draw state
+      /*  c.save(); //save the current draw state
         c.translate(_private.x,_private.y); //set drawing area to where the tank is
         c.rotate(_private.angle); //rotate drawing area to tank's angle
         c.fillRect(-_private.length/2, -_private.width/2, _private.length, _private.width); // draw the tank
-        c.restore(); //restore the previous draw state
+        c.restore(); //restore the previous draw state		*/
 
         // draw tank sprite
         c.save(); //save the current draw state
@@ -125,13 +132,19 @@ function Tank(tt, data, remote) {
         c.restore(); //restore the previous draw state
 
         // draw cannon
-        c.save();
+      /*  c.save();
         c.translate(_private.x,_private.y);
         c.rotate(_private.aimAngle);
-        c.fillRect(0, 0, _private.length, 5);
-        c.restore();
+        c.fillRect(0, 0, _private.length, 2);
+        c.restore();		*/
 
+		c.save();
+        c.translate(_private.x,_private.y);
+        c.rotate(_private.aimAngle);
 
+		_private.turretSprite.draw(c, [0 , 0]);
+		c.restore(); //restore the previous draw state
+		
         /** The rest of this draw function is used for debugging */
 
         //// draw aabb collision box
