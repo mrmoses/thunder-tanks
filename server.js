@@ -1,9 +1,10 @@
 var express = require('express')
   , path = require('path')
   , app = express()
-  , host = process.env.IP || 'localhost'
   , port = process.env.PORT || 5000
-  , io = require('socket.io').listen(app.listen(port, host));
+  //, host = process.env.IP || 'localhost'
+  //, io = require('socket.io').listen(app.listen(port, host));
+  , io = require('socket.io').listen(app.listen(port));
 
 app.configure(function(){
   // serve css, js, images folders as static files
