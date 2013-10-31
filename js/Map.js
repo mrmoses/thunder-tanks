@@ -9,6 +9,13 @@ function Map(tt) {
 
     this.init = function() {
         // add map boundary boxes for collision detection
+		
+		for(var i=0; i<=10; i++){
+			for(var j=0; j<=5; j++){
+				var texture =  new Texture(i*100, j*100, 100, 100);
+				this.tt.addObstacle(texture);
+			}
+		}
 
         // top boundary
         var top =  new Block(-5, -100, this.game.width + 5, 100);
@@ -42,6 +49,16 @@ function Map(tt) {
     }
 }
 
+function Texture(x,y,w,h) {
+    var SELF = this;
+	var base_image = new Image();
+	base_image.src = '/images/sandtexture.jpg';
+    this.draw = function(c, gs) {
+        c.fillRect(x, y, w, h);
+		c.drawImage(base_image, x, y, w, h);
+    }
+}
+
 function Block(x,y,w,h) {
     var SELF = this;
 
@@ -57,11 +74,16 @@ function Block(x,y,w,h) {
             [x,y+h]
         ]
     }
+	
+	var image1 = new Image();
+	image1.src = '/images/bricks.jpg';
+	
 
     this.draw = function(c, gs) {
         // draw block
-	c.fillStyle = 'rgba(200, 200, 200, 1.0)';
-        c.fillRect(_private.leftX, _private.topY, _private.width, _private.length);
+		c.fillStyle = 'rgba(200, 200, 200, 1.0)';
+        c.rect(_private.leftX, _private.topY, _private.width, _private.length);
+		c.drawImage(image1, _private.leftX, _private.topY, _private.width, _private.length);
     }
 
     /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
