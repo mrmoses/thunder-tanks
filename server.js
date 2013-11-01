@@ -20,15 +20,6 @@ app.get('/', function(req, res){
 
 console.log('Listening on port ' + port);
 
-/* Heroku Socket.IO configuration https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku */
-// assuming io is the Socket.IO server object
-// io.configure(function () {
-//   io.set("transports", ["xhr-polling"]);
-//   io.set("polling duration", 10);
-// });
-/* END Heroku Socket.IO configuration */
-
-
 /** Here be multiplayer dragons */
 
 var tanks = {};
