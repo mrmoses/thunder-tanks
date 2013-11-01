@@ -2,8 +2,9 @@ var express = require('express')
   , path = require('path')
   , app = express()
   , port = process.env.PORT || 5000
-  //, host = process.env.IP || 'localhost'
-  //, io = require('socket.io').listen(app.listen(port, host));
+  // Cloud9 needs PORT and IP. If there is a PORT and IP, use IP.
+  // Heroku needs PORT, but does not have IP. If there is PORT and no IP, use null.
+  , host = (process.env.PORT && process.env.IP) ? process.env.IP : (process.env.PORT ? null : 'localhost')
   , io = require('socket.io').listen(app.listen(port));
 
 app.configure(function(){
