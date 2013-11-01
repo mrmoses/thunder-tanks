@@ -12,54 +12,54 @@ function Map(tt) {
 		
 		for(var i=0; i<=10; i++){
 			for(var j=0; j<=5; j++){
-				var texture =  new Texture(i*100, j*100, 100, 100);
+				var texture =  new Texture(tt, i*100, j*100, 100, 100);
 				this.tt.addObstacle(texture);
 			}
 		}
 
         // top boundary
-        var top =  new Block(-5, -100, this.game.width + 5, 100);
+        var top =  new Block(tt, -5, -100, this.game.width + 5, 100);
         this.tt.addObstacle(top);
 
-        var bottom =  new Block(-5, this.game.height, this.game.width + 5, 100);
+        var bottom =  new Block(tt, -5, this.game.height, this.game.width + 5, 100);
         this.tt.addObstacle(bottom);
 
-        var left = new Block(-100, -5, 100, this.game.height + 5);
+        var left = new Block(tt, -100, -5, 100, this.game.height + 5);
         this.tt.addObstacle(left);
 
-        var right =  new Block(this.game.width, -5, 100, this.game.height + 5);
+        var right =  new Block(tt, this.game.width, -5, 100, this.game.height + 5);
         this.tt.addObstacle(right);
 
 
         // block in the middle
-        var block1 = new Block(this.game.width*.25-50, this.game.height*.25-50, 100, 100);
+        var block1 = new Block(tt, this.game.width*.25-50, this.game.height*.25-50, 100, 100);
         this.tt.addObstacle(block1);
 
         // block in the middle
-        var block2 = new Block(this.game.width*.75-50, this.game.height*.25-50, 100, 100);
+        var block2 = new Block(tt, this.game.width*.75-50, this.game.height*.25-50, 100, 100);
         this.tt.addObstacle(block2);
 
         // block in the middle
-        var block3 = new Block(this.game.width*.25-50, this.game.height*.75-50, 100, 100);
+        var block3 = new Block(tt, this.game.width*.25-50, this.game.height*.75-50, 100, 100);
         this.tt.addObstacle(block3);
 
         // block in the middle
-        var block4 = new Block(this.game.width*.75-50, this.game.height*.75-50, 100, 100);
+        var block4 = new Block(tt, this.game.width*.75-50, this.game.height*.75-50, 100, 100);
         this.tt.addObstacle(block4);
     }
 }
 
-function Texture(x,y,w,h) {
+function Texture(tt, x,y,w,h) {
     var SELF = this;
 	var base_image = new Image();
-	base_image.src = '/images/sandtexture.jpg';
+	base_image.src = tt.urlPath + '/images/sandtexture.jpg';
     this.draw = function(c, gs) {
         c.fillRect(x, y, w, h);
 		c.drawImage(base_image, x, y, w, h);
     }
 }
 
-function Block(x,y,w,h) {
+function Block(tt, x,y,w,h) {
     var SELF = this;
 
     var _private = {
@@ -76,7 +76,7 @@ function Block(x,y,w,h) {
     }
 	
 	var image1 = new Image();
-	image1.src = '/images/bricks.jpg';
+	image1.src = tt.urlPath + '/images/bricks.jpg';
 	
 
     this.draw = function(c, gs) {
