@@ -46,5 +46,24 @@ var TTMaps = {
         h: 100
       }
     ]
+  },
+  Dirt1: {
+    Patterns: [{
+      img: dirt1,
+      x: 0,
+      y: 0,
+      w: 970,
+      h: 546
+    }],
+    Textures: [],
+    Blocks: [
+      {
+        img: grey1,
+        x: 435,
+        y: 223,
+        w: 100,
+        h: 100
+      }
+    ]
   }
 }
