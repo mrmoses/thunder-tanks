@@ -312,9 +312,11 @@ function Tank(tt, data, remote) {
                 mousex = mouseposition[0],
                 mousey = mouseposition[1],
                 barrelTipX = _private.x + _private.length * Math.cos(_private.aimAngle),
-                barrelTipY = _private.y + _private.length * Math.sin(_private.aimAngle);
+                barrelTipY = _private.y + _private.length * Math.sin(_private.aimAngle),
+                targetX = _private.x + (_private.length*2) * Math.cos(_private.aimAngle),
+                targetY = _private.y + (_private.length*2) * Math.sin(_private.aimAngle);
 
-            tt.addBullet(barrelTipX,barrelTipY,mousex,mousey);
+            tt.addBullet(barrelTipX,barrelTipY,targetX,targetY);
 
             // send bullets to remote players
             if (!_private.remote && typeof multiplayerConn != 'undefined') {
