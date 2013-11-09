@@ -1,69 +1,56 @@
+/**
+ * Map configurations.
+ *
+ * A map configuration requires:
+ *  Textures
+ *    [x,y,width,height,image]
+ *    Just graphics with no collisions (background).
+ *  Blocks
+ *    [x,y,width,height,image]
+ *    Rectangles that cause collisions.
+ *
+ *
+ * Map dimensions are 970x546
+ *
+ * Available images:
+ *  dirt1: 32x32 of dirt
+ *  gret1: 32x32 grey metal type graphic
+ *
+ */
+
 var TTMaps = {
+
+  /** Classic map of 4 blocks. */
   Classic: {
-    Patterns: [],
-    Textures: (function() {
-      var textures = [];
-      for (var x = 0; x < 10; x++) {
-        for (var y = 0; y < 6; y++) {
-          textures[textures.length] = {
-            img: sandtexture,
-            x: x*100,
-            y: y*100,
-            w: 100,
-            h: 100
-          };
-        }
-      }
-      return textures;
-    })(),
+    Textures: [
+      [0,0,970,546,dirt1]
+    ],
     Blocks: [
-      {
-        img: bricks,
-        x: 192,
-        y: 87,
-        w: 100,
-        h: 100
-      },
-      {
-        img: bricks,
-        x: 678,
-        y: 87,
-        w: 100,
-        h: 100
-      },
-      {
-        img: bricks,
-        x: 192,
-        y: 360,
-        w: 100,
-        h: 100
-      },
-      {
-        img: bricks,
-        x: 678,
-        y: 360,
-        w: 100,
-        h: 100
-      }
+      [192,87,96,96,grey1],
+      [678,87,96,96,grey1],
+      [192,360,96,96,grey1],
+      [678,360,96,96,grey1]
     ]
   },
+
+  /** 1 centered block. */
   Dirt1: {
-    Patterns: [{
-      img: dirt1,
-      x: 0,
-      y: 0,
-      w: 970,
-      h: 546
-    }],
-    Textures: [],
+    Textures: [
+      [0,0,970,546,dirt1]
+    ],
     Blocks: [
-      {
-        img: grey1,
-        x: 435,
-        y: 223,
-        w: 100,
-        h: 100
-      }
+      [435,223,96,96,grey1]
+    ]
+  },
+
+  /** N-like path/shape. */
+  BigN: {
+    Textures: [
+      [0,0,970,546,dirt1]
+    ],
+    Blocks: [
+      [323,194,32,352,grey1],
+      [646,0,32,352,grey1]
     ]
   }
 }
