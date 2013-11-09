@@ -21,6 +21,18 @@ function Map(tt, MapConfig) {
     this.tt.addObstacle(new Block(tt, null, -100, -5, 100, this.game.height + 5)); // left
     this.tt.addObstacle(new Block(tt, null, this.game.width, -5, 100, this.game.height + 5)); // right
 
+    // patterns
+    for(var i=0; i<MapConfig.Patterns.length; i++) {
+      this.tt.addObstacle(
+        new Pattern(tt,
+                  MapConfig.Patterns[i].img,
+                  MapConfig.Patterns[i].x,
+                  MapConfig.Patterns[i].y,
+                  MapConfig.Patterns[i].w,
+                  MapConfig.Patterns[i].h)
+      );
+    }
+
     // textures
     for(var i=0; i<MapConfig.Textures.length; i++) {
       this.tt.addObstacle(
@@ -63,6 +75,14 @@ function Map(tt, MapConfig) {
 function Texture(tt, img, x, y, w, h) {
   this._draw = function(c) {
     c.drawImage(img, x, y, w, h);
+  }
+}
+
+function Pattern(tt, img, x, y, w, h) {
+  this._draw = function(c) {
+    c.rect(x,y,w,h);
+    c.fillStyle = c.createPattern(img,'repeat');
+    c.fill();
   }
 }
 

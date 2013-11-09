@@ -1,5 +1,6 @@
 var TTMaps = {
   Classic: {
+    Patterns: [],
     Textures: (function() {
       var textures = [];
       for (var x = 0; x < 10; x++) {
