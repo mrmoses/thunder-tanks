@@ -71,8 +71,8 @@ var ThunderTanks = function() {
         return _private.tanks[data.id];
     }
 
-    this.addMap = function() {
-        var map = new Map(this);
+    this.addMap = function(mapConfig) {
+        var map = new Map(SELF, mapConfig);
         this.game.addEntity(map);
         return map;
     }
@@ -81,6 +81,10 @@ var ThunderTanks = function() {
         this.game.addEntity(obst);
         _private.obstacles.push(obst);
         return obst;
+    }
+
+    this.getObstacles = function() {
+        return _private.obstacles;
     }
 
     /** Adds a bullet to the game.
@@ -164,7 +168,7 @@ var ThunderTanks = function() {
             SELF.game.addEntity(SELF);
 
             // add an instance of the map
-            SELF.addMap();
+            SELF.addMap(TTMaps.Classic);
 
             // launch the game
             SELF.game.launch();
