@@ -93,32 +93,32 @@ function Block(tt, img, x, y, w, h) {
       leftX: x,
       topY: y,
       width: w,
-      length: h,
+      height: h,
       poly: [
         [x,y],
         [x+w,y],
         [x+w,y+h],
         [x,y+h]
-      ]
+      ],
+      imgCache: new Image()
   }
 
+  //this.draw = function(c, gs) {
+  //  this._draw(c);
+  //}
+
   this._draw = function(c) {
-    // draw block
-    c.fillStyle = 'rgba(200, 200, 200, 1.0)';
-    c.rect(_private.leftX, _private.topY, _private.width, _private.length);
-    if (img) {
-      c.drawImage(img, _private.leftX, _private.topY, _private.width, _private.length);
-    }
+    c.drawImage(_private.imgCache, _private.leftX, _private.topY);
   }
 
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
   this.get_collision_aabb = function() {
-    return [_private.leftX,_private.topY,_private.width,_private.length];
+    return [_private.leftX,_private.topY,_private.width,_private.height];
   }
 
   /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
   this.get_collision_circle = function() {
-    var aSqrd = (_private.length*_private.length)/4;
+    var aSqrd = (_private.length*_private.height)/4;
     var bSqrd = (_private.width*_private.width)/4;
     // equals c squared
     var radius = Math.sqrt(aSqrd+bSqrd);
@@ -128,5 +128,19 @@ function Block(tt, img, x, y, w, h) {
   /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
   this.get_collision_poly = function() {
     return _private.poly;
-  }
+  };
+
+  (function() {
+    // render full map in memory and store as an image
+    var canvasCache = document.createElement('canvas');
+    canvasCache.setAttribute('width',_private.width);
+    canvasCache.setAttribute('height',_private.height);
+    var ccCtx = canvasCache.getContext('2d');
+
+    // draw block
+    ccCtx.fillStyle = img ? ccCtx.createPattern(img,'repeat') : 'rgba(200, 200, 200, 1.0)';
+    ccCtx.fillRect(0,0,_private.width,_private.height);
+
+    _private.imgCache.src = canvasCache.toDataURL("image/png");
+  })();
 }
