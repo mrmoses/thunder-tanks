@@ -12,6 +12,9 @@ var ThunderTanks = function() {
     /** @type JSGameSoup */
     this.game;
 
+    // this entity gets a high priority for debugging/drawing collission borders
+    this.priority = 1;
+
     /** @type String The URL path (without trailing /) */
     this.urlPath = window.location.pathname.substr(0, window.location.pathname.length - (/\/$/.test(window.location.pathname) ? 1 : 0));
 
@@ -56,6 +59,46 @@ var ThunderTanks = function() {
         //collide.aabb(_private.tankArray, _private.tankArray);
 
         return;
+    }
+
+    this.draw = function(c, gs) {
+      /** draw collision areas */
+      if (tt.debug) {
+        var entities = _private.tankArray.concat(_private.obstacles);
+
+        c.lineWidth = 1;
+        for(var i = 0; i < entities.length; i++) {
+          // draw aabb collision box
+          if (entities[i].get_collision_aabb) {
+            var aabb = entities[i].get_collision_aabb();
+            c.strokeStyle = '#ff0000';
+            c.rect(aabb[0], aabb[1], aabb[2], aabb[3]);
+            c.stroke();
+          }
+
+          // draw circle collision box
+          if (entities[i].get_collision_circle) {
+            var circle = entities[i].get_collision_circle();
+            c.strokeStyle = '#0000ff';
+            c.beginPath();
+            c.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
+            c.stroke();
+          }
+
+          // draw polygon collision box
+          if (entities[i].get_collision_poly) {
+            var poly = entities[i].get_collision_poly();
+            c.strokeStyle = '#ff00ff';
+            c.beginPath();
+            c.moveTo(poly[0][0],poly[0][1]);
+            for(var p = 1; p < poly.length; p++) {
+              c.lineTo(poly[p][0],poly[p][1]);
+            }
+            c.closePath();
+            c.stroke();
+          }
+        }
+      }
     }
 
     this.alerts = new Alerts();

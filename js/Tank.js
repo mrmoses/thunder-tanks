@@ -39,13 +39,13 @@ function Tank(tt, data, remote) {
             _private.tankSprite.action("still");
             _private.tankSprite.angle(_private.angle);
         }),
-		turretSprite: new Sprite(["center", "center"], {
-			"still": [[SELF.tt.urlPath + '/images/tank/turret.png', 1] , [SELF.tt.urlPath + '/images/tank/turret.png', 1]]
-		},
-		function() {
-		    _private.turretSprite.action("still");
+        turretSprite: new Sprite(["center", "center"], {
+            "still": [[SELF.tt.urlPath + '/images/tank/turret.png', 1] , [SELF.tt.urlPath + '/images/tank/turret.png', 1]]
+        },
+        function() {
+            _private.turretSprite.action("still");
             _private.turretSprite.angle(_private.aimAngle);
-		}),
+        }),
     }
 
     /**
@@ -128,7 +128,7 @@ function Tank(tt, data, remote) {
         c.translate(_private.x,_private.y); //set drawing area to where the tank is
         c.rotate(_private.angle); //rotate drawing area to tank's angle
         c.fillRect(-_private.length/2, -_private.width/2, _private.length, _private.width); // draw the tank
-        c.restore(); //restore the previous draw state		*/
+        c.restore(); //restore the previous draw state        */
 
         // draw tank sprite
         c.save(); //save the current draw state
@@ -140,35 +140,12 @@ function Tank(tt, data, remote) {
         c.translate(_private.x,_private.y);
         c.rotate(_private.aimAngle);
 
-		_private.turretSprite.draw(c, [0 , 0]);
-		c.restore(); //restore the previous draw state
-		
+        _private.turretSprite.draw(c, [0 , 0]);
+        c.restore(); //restore the previous draw state
+
         /** The rest of this draw function is used for debugging */
         if (this.tt.debug) {
             c.lineWidth = 1;
-
-            // draw aabb collision box
-            var aabb = this.get_collision_aabb();
-            c.strokeStyle = '#ff0000';
-            c.rect(aabb[0], aabb[1], aabb[2], aabb[3]);
-            c.stroke();
-
-            // draw circle collision box
-            var circle = this.get_collision_circle();
-            c.strokeStyle = '#0000ff';
-            c.beginPath();
-            c.arc(circle[0][0], circle[0][1], circle[1], 0, 2 * Math.PI, false);
-            c.stroke();
-
-            // draw polygon collision box
-            c.strokeStyle = '#ff00ff';
-            c.beginPath();
-            c.moveTo(_private.poly[0][0],_private.poly[0][1]);
-            for(var i = 1; i < _private.poly.length; i++) {
-                c.lineTo(_private.poly[i][0],_private.poly[i][1]);
-            }
-            c.closePath();
-            c.stroke();
 
             // front circle
             c.beginPath();
