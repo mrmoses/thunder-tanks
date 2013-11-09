@@ -17,24 +17,28 @@ var TTMaps = {
     })(),
     Blocks: [
       {
+        img: bricks,
         x: 192,
         y: 87,
         w: 100,
         h: 100
       },
       {
+        img: bricks,
         x: 678,
         y: 87,
         w: 100,
         h: 100
       },
       {
+        img: bricks,
         x: 192,
         y: 360,
         w: 100,
         h: 100
       },
       {
+        img: bricks,
         x: 678,
         y: 360,
         w: 100,

@@ -16,10 +16,10 @@ function Map(tt, MapConfig) {
 
   this.init = function() {
     // add boundary boxes for collision detection
-    this.tt.addObstacle(new Block(tt, -5, -100, this.game.width + 5, 100)); // top
-    this.tt.addObstacle(new Block(tt, -5, this.game.height, this.game.width + 5, 100)); // bottom
-    this.tt.addObstacle(new Block(tt, -100, -5, 100, this.game.height + 5)); // left
-    this.tt.addObstacle(new Block(tt, this.game.width, -5, 100, this.game.height + 5)); // right
+    this.tt.addObstacle(new Block(tt, null, -5, -100, this.game.width + 5, 100)); // top
+    this.tt.addObstacle(new Block(tt, null, -5, this.game.height, this.game.width + 5, 100)); // bottom
+    this.tt.addObstacle(new Block(tt, null, -100, -5, 100, this.game.height + 5)); // left
+    this.tt.addObstacle(new Block(tt, null, this.game.width, -5, 100, this.game.height + 5)); // right
 
     // textures
     for(var i=0; i<MapConfig.Textures.length; i++) {
@@ -37,6 +37,7 @@ function Map(tt, MapConfig) {
     for(var i=0; i<MapConfig.Blocks.length; i++) {
       this.tt.addObstacle(
         new Block(tt,
+                  MapConfig.Blocks[i].img,
                   MapConfig.Blocks[i].x,
                   MapConfig.Blocks[i].y,
                   MapConfig.Blocks[i].w,
@@ -50,9 +51,9 @@ function Map(tt, MapConfig) {
     canvasCache.setAttribute('height',SELF.game.height);
     var ccCtx = canvasCache.getContext('2d');
 
-    var obstacles = tt.getObstacles();
-    for (var i = 0; i<obstacles.length; i++) {
-      obstacles[i]._draw(ccCtx);
+    var mapGraphics = tt.getObstacles();
+    for (var i = 0; i<mapGraphics.length; i++) {
+      mapGraphics[i]._draw(ccCtx);
     }
     background_img.src = canvasCache.toDataURL("image/png");
 
@@ -65,7 +66,7 @@ function Texture(tt, img, x, y, w, h) {
   }
 }
 
-function Block(tt, x, y, w, h) {
+function Block(tt, img, x, y, w, h) {
   var SELF = this;
 
   var _private = {
@@ -85,7 +86,9 @@ function Block(tt, x, y, w, h) {
     // draw block
     c.fillStyle = 'rgba(200, 200, 200, 1.0)';
     c.rect(_private.leftX, _private.topY, _private.width, _private.length);
-    c.drawImage(bricks, _private.leftX, _private.topY, _private.width, _private.length);
+    if (img) {
+      c.drawImage(img, _private.leftX, _private.topY, _private.width, _private.length);
+    }
   }
 
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
