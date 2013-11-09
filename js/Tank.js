@@ -32,20 +32,32 @@ function Tank(tt, data, remote) {
         fireCooldown: 0,
         remote: remote,
         tankSprite: new Sprite(["center", "center"], {
-            "still": [[SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png', 1] , [SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png'], 1],
-            "forward": [[SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1] , [SELF.tt.urlPath + '/images/tank/tanksprite1.png', 1]]
-        },
-        function() {
-            _private.tankSprite.action("still");
-            _private.tankSprite.angle(_private.angle);
-        }),
+            "forward": [[SELF.tt.urlPath + '/images/tank/tankspritenoturret1.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret2.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret3.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret4.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret5.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret6.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret7.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret8.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret9.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret10.png', 2],
+                        [SELF.tt.urlPath + '/images/tank/tankspritenoturret11.png', 2],
+                       ],
+            },
+            function() {
+                _private.tankSprite.action("forward");
+                _private.tankSprite.angle(_private.angle);
+            }
+        ),
         turretSprite: new Sprite(["center", "center"], {
-            "still": [[SELF.tt.urlPath + '/images/tank/turret.png', 1] , [SELF.tt.urlPath + '/images/tank/turret.png', 1]]
-        },
-        function() {
-            _private.turretSprite.action("still");
-            _private.turretSprite.angle(_private.aimAngle);
-        }),
+                "still": [[SELF.tt.urlPath + '/images/tank/turret.png', 1] , [SELF.tt.urlPath + '/images/tank/turret.png', 1]]
+            },
+            function() {
+                _private.turretSprite.action("still");
+                _private.turretSprite.angle(_private.aimAngle);
+            }
+        ),
     }
 
     /**
@@ -114,7 +126,9 @@ function Tank(tt, data, remote) {
         }
 
         _private.tankSprite.angle(_private.angle);
-        _private.tankSprite.update();
+        if (_private.speed) {
+            _private.tankSprite.update();
+        }
     };
 
     /**
