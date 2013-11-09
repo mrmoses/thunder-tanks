@@ -211,7 +211,7 @@ var ThunderTanks = function() {
             SELF.game.addEntity(SELF);
 
             // add an instance of the map
-            SELF.addMap(TTMaps.Dirt1);
+            SELF.addMap(TTMaps.BigN);
 
             // launch the game
             SELF.game.launch();

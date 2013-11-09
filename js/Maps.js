@@ -41,5 +41,16 @@ var TTMaps = {
     Blocks: [
       [435,223,96,96,grey1]
     ]
+  },
+
+  /** N-like path/shape. */
+  BigN: {
+    Textures: [
+      [0,0,970,546,dirt1]
+    ],
+    Blocks: [
+      [323,194,32,352,grey1],
+      [646,0,32,352,grey1]
+    ]
   }
 }
