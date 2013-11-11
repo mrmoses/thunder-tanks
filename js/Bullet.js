@@ -25,6 +25,28 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         })
     };
 
+    var _events = {
+        /** change direction of bullet (anvil is the entity the bullet is hitting) */
+        richochet: function(anvil) { // take your aim, fire away, fire away!
+            entity_aabb = anvil.get_collision_aabb();
+            bullet_aabb = SELF.get_collision_aabb();
+
+            var topDiff = Math.abs(entity_aabb[1] - bullet_aabb[1]);
+            var bottomDiff = Math.abs(entity_aabb[1] + entity_aabb[3] - bullet_aabb[1] + bullet_aabb[3]);
+            var leftDiff = Math.abs(entity_aabb[0] - bullet_aabb[0]);
+            var rightDiff = Math.abs(entity_aabb[0] + entity_aabb[2] - bullet_aabb[0] + bullet_aabb[2]);
+
+            // if bullet is between entity top and bottom, its probably a side collision
+            if (topDiff < leftDiff && topDiff < rightDiff ||
+                bottomDiff < leftDiff && bottomDiff < rightDiff) {
+                _private.angle *= -1;
+            } else {
+                _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
+            }
+            _private.animation.angle(_private.angle);
+        }
+    }
+
     /**
      * @param {JSGameSoup} gs JSGameSoup instance
      */
@@ -68,6 +90,11 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         return [[_private.x,_private.y],_private.radius];
     }
 
+    /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
+    this.get_collision_poly = function() {
+        console.log('Bullet get_collision_poly not implemented yet');
+    }
+
     this.collide_aabb = function(entity, result) {
         // bullet vs bullet (handled in collide_circle)
 
@@ -76,29 +103,23 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
             SELF.kill();
 
         // bullet vs obstacle = bounce or die
-        } else if (entity instanceof Block || entity instanceof Tank) {
+        } else if (entity instanceof Block || entity instanceof Poly) {
             if (!_private.bounces) {
                 this.kill();
             } else {
                 _private.bounces--;
             }
 
-            entity_aabb = entity.get_collision_aabb();
-            bullet_aabb = this.get_collision_aabb();
+            _events.richochet(entity);
 
-            var topDiff = Math.abs(entity_aabb[1] - bullet_aabb[1]);
-            var bottomDiff = Math.abs(entity_aabb[1] + entity_aabb[3] - bullet_aabb[1] + bullet_aabb[3]);
-            var leftDiff = Math.abs(entity_aabb[0] - bullet_aabb[0]);
-            var rightDiff = Math.abs(entity_aabb[0] + entity_aabb[2] - bullet_aabb[0] + bullet_aabb[2]);
-
-            // if bullet is between entity top and bottom, its probably a side collision
-            if (topDiff < leftDiff && topDiff < rightDiff ||
-                bottomDiff < leftDiff && bottomDiff < rightDiff) {
-                _private.angle *= -1;
-            } else {
-                _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
-            }
-            _private.animation.angle(_private.angle);
+            //if (entity instanceof Poly) {
+            //    var polycollision = collide.collide_poly_entities(this,entity);
+            //    if (polycollision) {
+            //        _events.richochet(entity);
+            //    }
+            //} else {
+            //    _events.richochet(entity);
+            //}
         }
     }
 
