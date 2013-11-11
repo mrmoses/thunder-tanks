@@ -386,7 +386,7 @@ function Tank(tt, data, remote) {
             if (typeof multiplayerConn === 'undefined' || !_private.remote) {
                 SELF.kill();
             }
-        } else if (entity instanceof Block || entity instanceof Tank) {
+        } else if (entity instanceof Block || entity instanceof Poly || entity instanceof Tank) {
             // for some reason tanks are getting collision checks before they have dimensions, which causes errors
             if(this.get_collision_poly().length) {
                 var polycollision = collide.collide_poly_entities(this,entity);
