@@ -153,16 +153,19 @@ var ThunderTanks = function() {
         delete _private.tanks[id];
         _private.tankArray = $.map(_private.tanks, function(value,index) { return value;});
 
-        // if this was not a remote tank
-        if (!tank.isRemote()) {
-            // show alert
-            SELF.alerts.killed();
-            _private.playerTankDeployed = false;
+        // sometimes tank is undefined, not sure why,
+        if (tank) {
+          // if this was not a remote tank
+          if (!tank.isRemote()) {
+              // show alert
+              SELF.alerts.killed();
+              _private.playerTankDeployed = false;
 
-            // tell server this tank is dead
-            if (typeof multiplayerConn != 'undefined') {
-                multiplayerConn.emit('tank-killed');
-            }
+              // tell server this tank is dead
+              if (typeof multiplayerConn != 'undefined') {
+                  multiplayerConn.emit('tank-killed');
+              }
+          }
         }
 
         return

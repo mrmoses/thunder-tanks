@@ -45,6 +45,13 @@ function Map(tt, MapConfig) {
       );
     }
 
+    // polygons
+    for(var i=0; i<MapConfig.Polys.length; i++) {
+      this.tt.addObstacle(
+        new Poly(tt,MapConfig.Polys[i])
+      );
+    }
+
     // render full map in memory and store as an image
     var canvasCache = document.createElement('canvas');
     canvasCache.setAttribute('width',SELF.game.width);
@@ -128,5 +135,56 @@ function Block(tt, x, y, w, h, img) {
     ccCtx.fillRect(0,0,_private.width,_private.height);
 
     _private.imgCache.src = canvasCache.toDataURL("image/png");
+  })();
+}
+
+function Poly(tt, points) {
+  var SELF = this;
+
+  var minX = points[0][0];
+  var minY = points[0][1];
+  var maxX = points[0][0];
+  var maxY = points[0][1];
+
+  //this.draw = function(c, gs) {
+  //  this._draw(c);
+  //}
+
+  this._draw = function(c) {
+    c.strokeStyle = '#000000';
+    c.fillStyle = c.createPattern(grey1,'repeat');
+
+    c.beginPath();
+    c.moveTo(points[0][0],points[0][1]);
+    for(var p = 1; p < points.length; p++) {
+      c.lineTo(points[p][0],points[p][1]);
+    }
+    c.closePath();
+    c.stroke();
+    c.fill();
+  }
+
+  /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
+  this.get_collision_aabb = function() {
+    return [minX, minY, maxX - minX, maxY - minY];
+  }
+
+  /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
+  this.get_collision_circle = function() {
+    console.log('Poly get_collision_circle not implemented yet');
+  }
+
+  /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
+  this.get_collision_poly = function() {
+    return points;
+  };
+
+  (function() {
+    for(var p = 1; p < points.length; p++) {
+      minX = Math.min(minX, points[p][0]);
+      minY = Math.min(minY, points[p][1]);
+      maxX = Math.max(maxX, points[p][0]);
+      maxY = Math.max(maxY, points[p][1]);
+    }
   })();
 }
