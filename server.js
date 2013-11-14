@@ -16,6 +16,10 @@ app.configure(function(){
   app.use('/audio', express.static(path.join(__dirname, 'audio')));
 });
 
+app.get('/appcache',function(req,res) {
+  res.sendfile('appcache.manifest');
+});
+
 app.get('/credits', function(req, res){
   res.sendfile('credits.html');
 });
