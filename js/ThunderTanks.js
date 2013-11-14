@@ -3,6 +3,7 @@ if (typeof io != 'undefined') {
     multiplayerConn.on('connect', function() {
         console.log("connected to multiplayer server");
         $('#session-id').text(multiplayerConn.socket.sessionid);
+        tt.playSound('drummerTheme');
         tt.alerts.connected();
     });
 }
@@ -237,6 +238,7 @@ var tt = (function(tt) {
                     tt.removeTank(id);
                 });
             } else {
+                tt.playSound('drummerTheme');
                 tt.alerts.addAlert('info','Click anywhere to deploy a tank.');
                 //tt.addTank({id:'demo', x: 100, y: 100}, false);
 
