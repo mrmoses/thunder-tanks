@@ -13,6 +13,11 @@ app.configure(function(){
   app.use('/js', express.static(path.join(__dirname, 'js')));
   app.use('/images', express.static(path.join(__dirname, 'images')));
   app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
+  app.use('/audio', express.static(path.join(__dirname, 'audio')));
+});
+
+app.get('/credits', function(req, res){
+  res.sendfile('credits.html');
 });
 
 app.get('/', function(req, res){
