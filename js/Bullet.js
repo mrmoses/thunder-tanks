@@ -3,6 +3,8 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 
     /** @type ThunderTanks */
     this.tt = tt;
+	this.x = startx || this.game.width/2;
+	this.y = starty || this.game.height/2;
 
     /** @type JSGameSoup */
     this.game = tt.game;
@@ -13,8 +15,8 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         y: starty || this.game.height/2,
         targetx: targetx || this.game.random(0,this.game.width),
         targety: targety || this.game.random(0,this.game.height),
-        speed: speed || 10,
-        radius: 3,
+        speed: 5,
+        radius: 20,
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
         bounces: 1,
         animation: new Sprite(["center","center"], {
@@ -57,6 +59,15 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 
         // update sprite
         _private.animation.update();
+		
+		var numPoints = 8;
+		var points = [];
+		for (var i = 0; i < numPoints; i++){
+            var x = _private.radius * Math.sin(i * Math.PI / (numPoints / 2));
+            var y = _private.radius * Math.cos(i * Math.PI / (numPoints / 2));
+            points.push([x, y]);
+        }	
+		_private.poly = points;
     }
 
     /**
@@ -74,6 +85,17 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         c.save(); //save the current draw state
         _private.animation.draw(c,[_private.x,_private.y]);
         c.restore(); //restore the previous draw state
+		
+		var poly = this.get_collision_poly();
+		c.translate(_private.x, _private.y);
+		c.strokeStyle = '#ff00ff';			
+		c.beginPath();
+		c.moveTo(poly[0][0],poly[0][1]);
+		for(var p = 1; p < poly.length; p++) {
+		  c.lineTo(poly[p][0],poly[p][1]);
+		}
+		c.closePath();
+		c.stroke();
     }
 
     this.kill = function() {
@@ -91,8 +113,8 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     }
 
     /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
-    this.get_collision_poly = function() {
-        console.log('Bullet get_collision_poly not implemented yet');
+    this.get_collision_poly = function() {	
+		return _private.poly;
     }
 
     this.collide_aabb = function(entity, result) {
