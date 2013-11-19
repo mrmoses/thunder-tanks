@@ -130,6 +130,9 @@ function Block(tt, x, y, w, h, img) {
 
   this._draw = function(c) {
     c.drawImage(_private.imgCache, _private.leftX, _private.topY);
+    c.strokeStyle = '#000000';
+    c.rect(_private.leftX, _private.topY, _private.width, _private.height);
+    c.stroke();
   }
 
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
