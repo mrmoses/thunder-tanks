@@ -157,6 +157,11 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
                 _events.richochet(line2);
             } else {
                 console.log("single point collision", polycollision);
+
+                // the bullet must have skipped right over the edge-to-edge collission
+                // back that thang up to collide with the edge (next frame)
+
+                _events.moveForward(-1.5);
             }
         }
     }
