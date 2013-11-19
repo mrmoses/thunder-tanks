@@ -197,11 +197,6 @@ function Poly(tt, points) {
     return [minX, minY, maxX - minX, maxY - minY];
   }
 
-  /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
-  this.get_collision_circle = function() {
-    console.log('Poly get_collision_circle not implemented yet');
-  }
-
   /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
   this.get_collision_poly = function() {
     return points;
