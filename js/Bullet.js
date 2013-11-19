@@ -26,6 +26,11 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     };
 
     var _events = {
+        moveForward: function(frames) {
+            // move bullet
+            _private.x = _private.x + (_private.speed * frames) * Math.cos(_private.angle);
+            _private.y = _private.y + (_private.speed * frames) * Math.sin(_private.angle);
+        },
         /** change direction of bullet (anvil is the entity the bullet is hitting) */
         richochet: function(anvil) { // take your aim, fire away, fire away!
             entity_aabb = anvil.get_collision_aabb();
@@ -51,9 +56,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
-        // move bullet
-        _private.x = _private.x + _private.speed * Math.cos(_private.angle);
-        _private.y = _private.y + _private.speed * Math.sin(_private.angle);
+        _events.moveForward(1);
 
         // update sprite
         _private.animation.update();
