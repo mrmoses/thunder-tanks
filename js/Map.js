@@ -15,12 +15,6 @@ function Map(tt, MapConfig) {
   }
 
   this.init = function() {
-    // add boundary boxes for collision detection
-    this.tt.addObstacle(new Block(tt, -5, -100, this.game.width + 5, 100)); // top
-    this.tt.addObstacle(new Block(tt, -5, this.game.height, this.game.width + 5, 100)); // bottom
-    this.tt.addObstacle(new Block(tt, -100, -5, 100, this.game.height + 5)); // left
-    this.tt.addObstacle(new Block(tt, this.game.width, -5, 100, this.game.height + 5)); // right
-
     // textures
     for(var i=0; i<MapConfig.Textures.length; i++) {
       this.tt.addObstacle(
@@ -32,6 +26,12 @@ function Map(tt, MapConfig) {
                   MapConfig.Textures[i][4])
       );
     }
+
+    // add map boundary
+    this.tt.addObstacle(new Block(tt, 0, 0, this.game.width, 32, grey1)); // top
+    this.tt.addObstacle(new Block(tt, 0, this.game.height-32, this.game.width, 32, grey1)); // bottom
+    this.tt.addObstacle(new Block(tt, 0, 32, 32, this.game.height - 30, grey1)); // left
+    this.tt.addObstacle(new Block(tt, this.game.width - 32, 32, 32, this.game.height - 32, grey1)); // right
 
     // blocks
     for(var i=0; i<MapConfig.Blocks.length; i++) {
