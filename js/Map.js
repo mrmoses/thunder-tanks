@@ -15,12 +15,6 @@ function Map(tt, MapConfig) {
   }
 
   this.init = function() {
-    // add boundary boxes for collision detection
-    this.tt.addObstacle(new Block(tt, -5, -100, this.game.width + 5, 100)); // top
-    this.tt.addObstacle(new Block(tt, -5, this.game.height, this.game.width + 5, 100)); // bottom
-    this.tt.addObstacle(new Block(tt, -100, -5, 100, this.game.height + 5)); // left
-    this.tt.addObstacle(new Block(tt, this.game.width, -5, 100, this.game.height + 5)); // right
-
     // textures
     for(var i=0; i<MapConfig.Textures.length; i++) {
       this.tt.addObstacle(
@@ -32,6 +26,12 @@ function Map(tt, MapConfig) {
                   MapConfig.Textures[i][4])
       );
     }
+
+    // add map boundary
+    this.tt.addObstacle(new Block(tt, 0, 0, this.game.width, 32, grey1)); // top
+    this.tt.addObstacle(new Block(tt, 0, this.game.height-32, this.game.width, 32, grey1)); // bottom
+    this.tt.addObstacle(new Block(tt, 0, 32, 32, this.game.height - 30, grey1)); // left
+    this.tt.addObstacle(new Block(tt, this.game.width - 32, 32, 32, this.game.height - 32, grey1)); // right
 
     // blocks
     for(var i=0; i<MapConfig.Blocks.length; i++) {
@@ -79,6 +79,34 @@ function Texture(tt, x, y, w, h, img) {
   }
 }
 
+/** used for debugging */
+function Line(point1, point2) {
+
+  this.draw = function(c, gs) {
+    this._draw(c);
+  }
+
+  this._draw = function(c) {
+    c.strokeStyle = '#ff00ff';
+    c.beginPath();
+    c.moveTo(point1[0],point1[1]);
+    c.lineTo(point2[0],point2[1]);
+    c.stroke();
+
+    // p1 circle
+    c.beginPath();
+    c.strokeStyle = "#000000";
+    c.arc(point1[0], point1[1], 10, 0, 2 * Math.PI, false);
+    c.stroke();
+
+    //// p2 circle
+    //c.beginPath();
+    //c.strokeStyle = "#ffffff";
+    //c.arc(point2[0], point2[1], 10, 0, 2 * Math.PI, false);
+    //c.stroke();
+  }
+}
+
 function Block(tt, x, y, w, h, img) {
   var SELF = this;
 
@@ -102,6 +130,9 @@ function Block(tt, x, y, w, h, img) {
 
   this._draw = function(c) {
     c.drawImage(_private.imgCache, _private.leftX, _private.topY);
+    c.strokeStyle = '#000000';
+    c.rect(_private.leftX, _private.topY, _private.width, _private.height);
+    c.stroke();
   }
 
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
@@ -111,7 +142,7 @@ function Block(tt, x, y, w, h, img) {
 
   /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
   this.get_collision_circle = function() {
-    var aSqrd = (_private.length*_private.height)/4;
+    var aSqrd = (_private.height*_private.height)/4;
     var bSqrd = (_private.width*_private.width)/4;
     // equals c squared
     var radius = Math.sqrt(aSqrd+bSqrd);
@@ -167,11 +198,6 @@ function Poly(tt, points) {
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
   this.get_collision_aabb = function() {
     return [minX, minY, maxX - minX, maxY - minY];
-  }
-
-  /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
-  this.get_collision_circle = function() {
-    console.log('Poly get_collision_circle not implemented yet');
   }
 
   /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */

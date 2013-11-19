@@ -23,7 +23,7 @@ function Tank(tt, data, remote) {
         angle: 0, // angle in radians
         poly: [], // array of points that (corners of the tank)
         speed: 0,
-        maxSpeed: 4,
+        maxSpeed: 2,
         turnSpeed: 0,
         maxTurnSpeed: 0.1,
         aimAngle: MathUtil.degreesToRadians(0),
