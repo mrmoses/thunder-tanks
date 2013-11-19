@@ -211,7 +211,7 @@ var tt = (function(tt) {
             tt.game.addEntity(tt);
 
             // add an instance of the map
-            tt.addMap(TTMaps.BigN);
+            tt.addMap(TTMaps.Classic);
 
             // launch the game
             tt.game.launch();
