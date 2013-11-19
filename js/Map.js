@@ -79,6 +79,34 @@ function Texture(tt, x, y, w, h, img) {
   }
 }
 
+/** used for debugging */
+function Line(point1, point2) {
+
+  this.draw = function(c, gs) {
+    this._draw(c);
+  }
+
+  this._draw = function(c) {
+    c.strokeStyle = '#ff00ff';
+    c.beginPath();
+    c.moveTo(point1[0],point1[1]);
+    c.lineTo(point2[0],point2[1]);
+    c.stroke();
+
+    // p1 circle
+    c.beginPath();
+    c.strokeStyle = "#000000";
+    c.arc(point1[0], point1[1], 10, 0, 2 * Math.PI, false);
+    c.stroke();
+
+    //// p2 circle
+    //c.beginPath();
+    //c.strokeStyle = "#ffffff";
+    //c.arc(point2[0], point2[1], 10, 0, 2 * Math.PI, false);
+    //c.stroke();
+  }
+}
+
 function Block(tt, x, y, w, h, img) {
   var SELF = this;
 
