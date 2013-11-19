@@ -25,30 +25,51 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         })
     };
 
+    if (tt.debug) {
+        // draw a line for the initial path of the bullet
+        tt.game.addEntity(new Line([_private.x,_private.y],[_private.targetx,_private.targety]));
+    }
+
     var _events = {
         moveForward: function(frames) {
             // move bullet
             _private.x = _private.x + (_private.speed * frames) * Math.cos(_private.angle);
             _private.y = _private.y + (_private.speed * frames) * Math.sin(_private.angle);
         },
-        /** change direction of bullet (anvil is the entity the bullet is hitting) */
-        richochet: function(anvil) { // take your aim, fire away, fire away!
-            entity_aabb = anvil.get_collision_aabb();
-            bullet_aabb = SELF.get_collision_aabb();
 
-            var topDiff = Math.abs(entity_aabb[1] - bullet_aabb[1]);
-            var bottomDiff = Math.abs(entity_aabb[1] + entity_aabb[3] - bullet_aabb[1] + bullet_aabb[3]);
-            var leftDiff = Math.abs(entity_aabb[0] - bullet_aabb[0]);
-            var rightDiff = Math.abs(entity_aabb[0] + entity_aabb[2] - bullet_aabb[0] + bullet_aabb[2]);
+        /** Change direction of bullet
+         *
+         * @param {Array} line  Two points the define the plan the bullet is bouncing off of.
+         */
+        richochet: function(line) { // take your aim, fire away, fire away!
 
-            // if bullet is between entity top and bottom, its probably a side collision
-            if (topDiff < leftDiff && topDiff < rightDiff ||
-                bottomDiff < leftDiff && bottomDiff < rightDiff) {
-                _private.angle *= -1;
-            } else {
-                _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
+            var p1 = line[0];
+            var p2 = line[1];
+
+            // draw a line to show where the collission is
+            if (tt.debug) {
+                tt.game.addEntity(new Line(p1,p2));
             }
+
+            // the angle of the line the bullet is hitting
+            var objectAngle = MathUtil.radiansToDegrees(MathUtil.getAngle(p1[0], p1[1], p2[0], p2[1]));
+            // the angle the bullet is travelling
+            var bulletAngle = MathUtil.radiansToDegrees(_private.angle);
+            // the new angle of the bullet after bouncing
+            var newAngle = MathUtil.degreesToRadians(objectAngle + objectAngle - bulletAngle);
+
+            // show the new angle
+            if (tt.debug) {
+                var newPathX = _private.x + 50 * Math.cos(newAngle);
+                var newPathY = _private.y + 50 * Math.sin(newAngle);
+                // draw a line for the new path of the bullet
+                tt.game.addEntity(new Line([_private.x,_private.y],[newPathX,newPathY]));
+            }
+
+            // bound the bullet
+            _private.angle = newAngle;
             _private.animation.angle(_private.angle);
+            _private.bounces--;
         }
     }
 
@@ -115,35 +136,28 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     }
 
     /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
-    this.get_collision_poly = function() {	
-		return _private.poly;
+    this.get_collision_poly = function() {
+        return _private.poly;
     }
 
     this.collide_aabb = function(entity, result) {
-        // bullet vs bullet (handled in collide_circle)
 
-        // bullet vs tank = dead
-        if (entity instanceof Tank) {
-            SELF.kill();
+        var polycollision = collide.collide_poly_entities(this,entity);
 
-        // bullet vs obstacle = bounce or die
-        } else if (entity instanceof Block || entity instanceof Poly) {
-            if (!_private.bounces) {
-                this.kill();
-            } else {
-                _private.bounces--;
+        if (polycollision) {
+            if (entity instanceof Tank || !_private.bounces) {
+                return SELF.kill();
             }
 
-            _events.richochet(entity);
+            // poly collision could be intersecting lines, or 1 point
+            if (polycollision.length > 1) {
+                var line1 = polycollision[0]; // bullet
+                var line2 = polycollision[1]; // object
 
-            //if (entity instanceof Poly) {
-            //    var polycollision = collide.collide_poly_entities(this,entity);
-            //    if (polycollision) {
-            //        _events.richochet(entity);
-            //    }
-            //} else {
-            //    _events.richochet(entity);
-            //}
+                _events.richochet(line2);
+            } else {
+                console.log("single point collision", polycollision);
+            }
         }
     }
 
