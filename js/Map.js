@@ -139,7 +139,7 @@ function Block(tt, x, y, w, h, img) {
 
   /** @returns {Array}  The center of the circle and the radius like this: return [[x, y], r] */
   this.get_collision_circle = function() {
-    var aSqrd = (_private.length*_private.height)/4;
+    var aSqrd = (_private.height*_private.height)/4;
     var bSqrd = (_private.width*_private.width)/4;
     // equals c squared
     var radius = Math.sqrt(aSqrd+bSqrd);
