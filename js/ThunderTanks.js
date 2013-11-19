@@ -205,7 +205,7 @@ var tt = (function(tt) {
     (function() {
         JSGameSoup.ready(function() {
             // use the DIV tag with Id of 'surface' as our game surface
-            tt.game = new JSGameSoup("game", 30);
+            tt.game = new JSGameSoup("game", 60);
 
             // add this instance of ThunderTanks
             tt.game.addEntity(tt);
