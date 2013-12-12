@@ -19,10 +19,10 @@ var tt = (function(tt) {
 
     /** @type String The URL path (without trailing /) */
 
-    this.urlPath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') - (/\/$/.test(window.location.pathname) ? 1 : 0));
+    tt.urlPath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') - (/\/$/.test(window.location.pathname) ? 1 : 0));
 	   
 	// draws collision boundaries
-    this.debug = false;
+    tt.debug = false;
 
     var _private = {
         /** Tanks by id **/
@@ -217,9 +217,9 @@ var tt = (function(tt) {
             // add an instance of the map
 
 			if(myObj.room === 'roomOne')
-				SELF.addMap(TTMaps.PolyTest);
+				tt.addMap(TTMaps.PolyTest);
 			else
-				SELF.addMap(TTMaps.Classic);
+				tt.addMap(TTMaps.Classic);
 
             // launch the game
             tt.game.launch();
