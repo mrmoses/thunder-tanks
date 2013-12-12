@@ -146,15 +146,16 @@ function Tank(tt, data, remote) {
 
         // draw tank sprite
         c.save(); //save the current draw state
-        _private.tankSprite.draw(c, [_private.x, _private.y]);
+		if(_private.tankSprite)
+			_private.tankSprite.draw(c, [_private.x, _private.y]);
         c.restore(); //restore the previous draw state
 
         // draw cannon
         c.save();
         c.translate(_private.x,_private.y);
         c.rotate(_private.aimAngle);
-
-        _private.turretSprite.draw(c, [0 , 0]);
+		if(_private.turretSprite)
+			_private.turretSprite.draw(c, [0 , 0]);
         c.restore(); //restore the previous draw state
 
         /** The rest of this draw function is used for debugging */

@@ -1,5 +1,8 @@
+var myObj = $.deparam.querystring();
+console.log(myObj);
 if (typeof io != 'undefined') {
-    var multiplayerConn = io.connect();
+    var multiplayerConn = io.connect('/' + myObj.room);
+	
     multiplayerConn.on('connect', function() {
         console.log("connected to multiplayer server");
         $('#session-id').text(multiplayerConn.socket.sessionid);
@@ -16,9 +19,9 @@ var ThunderTanks = function() {
     this.priority = 1;
 
     /** @type String The URL path (without trailing /) */
-    this.urlPath = window.location.pathname.substr(0, window.location.pathname.length - (/\/$/.test(window.location.pathname) ? 1 : 0));
-
-    // draws collision boundaries
+    this.urlPath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') - (/\/$/.test(window.location.pathname) ? 1 : 0));
+	   
+	// draws collision boundaries
     this.debug = false;
 
     var _private = {
@@ -214,8 +217,10 @@ var ThunderTanks = function() {
             SELF.game.addEntity(SELF);
 
             // add an instance of the map
-            SELF.addMap(TTMaps.BigN);
-
+			if(myObj.room === 'roomOne')
+				SELF.addMap(TTMaps.PolyTest);
+			else
+				SELF.addMap(TTMaps.Classic);
             // launch the game
             SELF.game.launch();
 

@@ -8,22 +8,6 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!--<link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">-->
     <link href="css/layout.css" rel="stylesheet" />
-
-	<script>
-        function newRoom(){
-		
-            var newRoomName = $('#newRoomTxt').val();
-            var socket io.connect('http://localhost:5000/room.html');
-			socket.on(newRoomName, function() {
-				console.log("Connecting to room: " + newRoomName);
-			});
-		
-		}
-		
-	
-	</script>
-
-	
 </head>
 <body>
     <div class="container">
@@ -45,40 +29,29 @@
         <div class="alerts text-center">
         </div>
 
-        <div id="rooms">
-			<table>
-				<tr>
-					<td>
-						<img src ='/Images/map1.png' />
-					</td>
-					<td>
-						<img src='/Images/map1.png' />
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<center><a href= '/room.html?room=roomOne'><button id="joinMapOne">Join map one!</button></a></center>
-					</td>
-					<td>
-						<center><a href= '/room.html?room=roomTwo'><button name="joinMapOne">Join map two!</button></a></center>
-					</td>
-				</tr>
-			</table>
-		</div>
-		
-		
+        <div id="game"></div>
 
+        <!-- preloaded images -->
+        <div style="display:none; visibility: hidden;">
+            <img id="sandtexture" src="images/sandtexture.jpg" />
+            <img id="bricks" src="images/bricks.jpg" />
+            <img id="dirt1" src="images/dirt1.png" />
+            <img id="grey1" src="images/grey1.png" />
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/lib/jquery-2.0.3.min.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/jsgamesoup.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/sprite.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/collisions.js"></script>
-    <script src="js/MathUtil.js"></script>
+    <script src="js/lib/jquery.ba-bbq.min.js"></script>
+	<script src="js/MathUtil.js"></script>
     <script src="js/Alerts.js"></script>
     <script src="js/Maps.js"></script>
     <script src="js/Map.js"></script>
     <script src="js/Bullet.js"></script>
     <script src="js/Tank.js"></script>
     <script src="js/ThunderTanks.js"></script>
+	
 </body>
