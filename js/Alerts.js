@@ -1,5 +1,4 @@
-function Alerts() {
-    var SELF = this;
+var tt = (function(tt) {
 
     var _private = {
         killedMessages: [
@@ -11,27 +10,31 @@ function Alerts() {
         ]
     }
 
-    /**
-     * @param {String} type  'success' 'info' 'warning' or 'danger'
-     * @param {String} message  The message (html) of the alert
-     */
-    this.addAlert = function(type, message) {
-        var speed = (type === 'danger') ? 'fast' : '';
-        $('.alerts').prepend(
-            $('<div class="alert alert-' + type + '">' + message + '</div>').fadeIn(speed)
-        );
+    tt.alerts = {
+        /**
+         * @param {String} type  'success' 'info' 'warning' or 'danger'
+         * @param {String} message  The message (html) of the alert
+         */
+        addAlert: function(type, message) {
+            var speed = (type === 'danger') ? 'fast' : '';
+            $('.alerts').prepend(
+                $('<div class="alert alert-' + type + '">' + message + '</div>').fadeIn(speed)
+            );
+        },
+
+        connected: function() {
+            this.addAlert('info','<strong>Connected!</strong> Click anywhere to deploy a tank.');
+        },
+
+        killed: function(killedMessageIndex) {
+            killedMessageIndex = killedMessageIndex || Math.floor(Math.random() * _private.killedMessages.length);
+            this.addAlert('danger',_private.killedMessages[killedMessageIndex]);
+        },
+
+        clear: function() {
+            $('.alerts').children().fadeOut();
+        }
     }
 
-    this.connected = function() {
-        this.addAlert('info','<strong>Connected!</strong> Click anywhere to deploy a tank.');
-    }
-
-    this.killed = function(killedMessageIndex) {
-        killedMessageIndex = killedMessageIndex || Math.floor(Math.random() * _private.killedMessages.length);
-        this.addAlert('danger',_private.killedMessages[killedMessageIndex]);
-    }
-
-    this.clear = function() {
-        $('.alerts').children().fadeOut();
-    }
-}
+    return tt;
+})(tt || {});

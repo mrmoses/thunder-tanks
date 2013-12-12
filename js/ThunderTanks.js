@@ -6,19 +6,19 @@ if (typeof io != 'undefined') {
     multiplayerConn.on('connect', function() {
         console.log("connected to multiplayer server");
         $('#session-id').text(multiplayerConn.socket.sessionid);
+        tt.playSound('drummerTheme');
         tt.alerts.connected();
     });
 }
-var ThunderTanks = function() {
-    var SELF = this;
-
+var tt = (function(tt) {
     /** @type JSGameSoup */
-    this.game;
+    tt.game;
 
     // this entity gets a high priority for debugging/drawing collission borders
-    this.priority = 1;
+    tt.priority = 1;
 
     /** @type String The URL path (without trailing /) */
+
     this.urlPath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') - (/\/$/.test(window.location.pathname) ? 1 : 0));
 	   
 	// draws collision boundaries
@@ -44,7 +44,7 @@ var ThunderTanks = function() {
      *
      * @param {JSGameSoup} gs JSGameSoup instance
      */
-    this.update = function(gs) {
+    tt.update = function(gs) {
         //collide bullets and map objects
         collide.aabb(_private.bullets, _private.obstacles);
 
@@ -64,7 +64,7 @@ var ThunderTanks = function() {
         return;
     }
 
-    this.draw = function(c, gs) {
+    tt.draw = function(c, gs) {
       /** draw collision areas */
       if (tt.debug) {
         var entities = _private.tankArray.concat(_private.obstacles);
@@ -104,32 +104,30 @@ var ThunderTanks = function() {
       }
     }
 
-    this.alerts = new Alerts();
-
     /**
      * @param {Object} data  The tanks data (id, x, y)
      * @param {Boolean} remote  True if the tanks is a remote tanks
      */
-    this.addTank = function(data, remote) {
-        _private.tanks[data.id] = new Tank(this, data, remote);
+    tt.addTank = function(data, remote) {
+        _private.tanks[data.id] = new Tank(tt, data, remote);
         _private.tankArray = $.map(_private.tanks, function(value,index) { return value;})
-        this.game.addEntity(_private.tanks[data.id]);
+        tt.game.addEntity(_private.tanks[data.id]);
         return _private.tanks[data.id];
     }
 
-    this.addMap = function(mapConfig) {
-        var map = new Map(SELF, mapConfig);
-        this.game.addEntity(map);
+    tt.addMap = function(mapConfig) {
+        var map = new Map(tt, mapConfig);
+        tt.game.addEntity(map);
         return map;
     }
 
-    this.addObstacle = function(obst) {
-        this.game.addEntity(obst);
+    tt.addObstacle = function(obst) {
+        tt.game.addEntity(obst);
         _private.obstacles.push(obst);
         return obst;
     }
 
-    this.getObstacles = function() {
+    tt.getObstacles = function() {
         return _private.obstacles;
     }
 
@@ -141,18 +139,18 @@ var ThunderTanks = function() {
      * @param {int} targety The target y coordinate.
      * @returns {Bullet} An instance of a Bullet.
      */
-    this.addBullet = function(startx, starty, targetx, targety) {
-        var b = new Bullet(this, _private.bullets.length, startx, starty, targetx, targety);
+    tt.addBullet = function(startx, starty, targetx, targety) {
+        var b = new Bullet(tt, _private.bullets.length, startx, starty, targetx, targety);
         _private.bullets.push(b);
-        this.game.addEntity(b);
+        tt.game.addEntity(b);
         return b;
     }
 
-    this.removeTank = function(id) {
+    tt.removeTank = function(id) {
         var tank = _private.tanks[id];
 
         // remove the tank from the game
-        this.game.delEntity(tank);
+        tt.game.delEntity(tank);
         delete _private.tanks[id];
         _private.tankArray = $.map(_private.tanks, function(value,index) { return value;});
 
@@ -161,7 +159,7 @@ var ThunderTanks = function() {
           // if this was not a remote tank
           if (!tank.isRemote()) {
               // show alert
-              SELF.alerts.killed();
+              tt.alerts.killed();
               _private.playerTankDeployed = false;
 
               // tell server this tank is dead
@@ -174,20 +172,20 @@ var ThunderTanks = function() {
         return
     };
 
-    this.removeBullet = function(bulletIndex) {
-        this.game.delEntity(_private.bullets[bulletIndex]);
+    tt.removeBullet = function(bulletIndex) {
+        tt.game.delEntity(_private.bullets[bulletIndex]);
         delete _private.bullets[bulletIndex];
     };
 
     // defines clickable area
-    this.pointerBox = function() {
-        return [0, 0, this.game.width, this.game.height];
+    tt.pointerBox = function() {
+        return [0, 0, tt.game.width, tt.game.height];
     }
 
-    this.pointerDown = function(button) {
+    tt.pointerDown = function(button) {
         if (!_private.playerTankDeployed) {
             _private.playerTankDeployed = true;
-            var mouseposition = this.game.pointerPosition,
+            var mouseposition = tt.game.pointerPosition,
                 mousex = mouseposition[0],
                 mousey = mouseposition[1];
 
@@ -196,14 +194,14 @@ var ThunderTanks = function() {
                     if (typeof multiplayerConn != 'undefined') {
                         multiplayerConn.emit('add-player-tank', {x: mousex, y:mousey});
                     } else {
-                        SELF.addTank({id: 'player', x: mousex, y:mousey}, false);
+                        tt.addTank({id: 'player', x: mousex, y:mousey}, false);
                     }
                     break;
                 case 2:
                     break;
             }
 
-            SELF.alerts.clear();
+            tt.alerts.clear();
         }
     };
 
@@ -211,51 +209,54 @@ var ThunderTanks = function() {
     (function() {
         JSGameSoup.ready(function() {
             // use the DIV tag with Id of 'surface' as our game surface
-            SELF.game = new JSGameSoup("game", 30);
+            tt.game = new JSGameSoup("game", 60);
 
             // add this instance of ThunderTanks
-            SELF.game.addEntity(SELF);
+            tt.game.addEntity(tt);
 
             // add an instance of the map
+
 			if(myObj.room === 'roomOne')
 				SELF.addMap(TTMaps.PolyTest);
 			else
 				SELF.addMap(TTMaps.Classic);
+
             // launch the game
-            SELF.game.launch();
+            tt.game.launch();
 
             if (typeof multiplayerConn != 'undefined') {
                 multiplayerConn.on('add-tank', function (data) {
                     var isRemote = data.id !== multiplayerConn.socket.sessionid;
                     // local player tank
                     if (isRemote) {
-                        SELF.addTank(data, isRemote);
+                        tt.addTank(data, isRemote);
                     } else {
-                        SELF.addTank(data, isRemote);
+                        tt.addTank(data, isRemote);
                     }
                 });
                 multiplayerConn.on('add-bullet', function (data) {
                     // add bullet
-                    SELF.addBullet(data.startx, data.starty, data.targetx, data.targety);
+                    tt.addBullet(data.startx, data.starty, data.targetx, data.targety);
                 });
                 multiplayerConn.on('remote-tank-update', function (data) {
                     // update tank
                     _private.tanks[data.id].remoteUpdate(data);
                 });
                 multiplayerConn.on('remove-tank', function (id) {
-                    SELF.removeTank(id);
+                    tt.removeTank(id);
                 });
             } else {
+                tt.playSound('drummerTheme');
                 tt.alerts.addAlert('info','Click anywhere to deploy a tank.');
-                //SELF.addTank({id:'demo', x: 100, y: 100}, false);
+                //tt.addTank({id:'demo', x: 100, y: 100}, false);
 
                 // enemy in the opposite corner
-                SELF.addTank({id:'enemy1', x: SELF.game.width - 100, y: SELF.game.height - 100}, true);
+                tt.addTank({id:'enemy1', x: tt.game.width - 100, y: tt.game.height - 100}, true);
 
                 /** Target Practice
                 for (var x = 50; x <= 500; x+=100){
                     for (var y = 50; y <= 500; y += 100) {
-                        SELF.addPlayer({id:'target'+x+y,x:x,y:y}, true);
+                        tt.addPlayer({id:'target'+x+y,x:x,y:y}, true);
                     }
                 }
                 */
@@ -263,5 +264,6 @@ var ThunderTanks = function() {
 
         });
     })();
-},
-tt = new ThunderTanks();
+
+    return tt;
+})(tt || {});

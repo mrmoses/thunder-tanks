@@ -13,7 +13,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         y: starty || this.game.height/2,
         targetx: targetx || this.game.random(0,this.game.width),
         targety: targety || this.game.random(0,this.game.height),
-        speed: speed || 10,
+        speed: speed || 5,
         radius: 3,
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
         bounces: 1,
@@ -25,25 +25,51 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         })
     };
 
+    if (tt.debug) {
+        // draw a line for the initial path of the bullet
+        tt.game.addEntity(new Line([_private.x,_private.y],[_private.targetx,_private.targety]));
+    }
+
     var _events = {
-        /** change direction of bullet (anvil is the entity the bullet is hitting) */
-        richochet: function(anvil) { // take your aim, fire away, fire away!
-            entity_aabb = anvil.get_collision_aabb();
-            bullet_aabb = SELF.get_collision_aabb();
+        moveForward: function(frames) {
+            // move bullet
+            _private.x = _private.x + (_private.speed * frames) * Math.cos(_private.angle);
+            _private.y = _private.y + (_private.speed * frames) * Math.sin(_private.angle);
+        },
 
-            var topDiff = Math.abs(entity_aabb[1] - bullet_aabb[1]);
-            var bottomDiff = Math.abs(entity_aabb[1] + entity_aabb[3] - bullet_aabb[1] + bullet_aabb[3]);
-            var leftDiff = Math.abs(entity_aabb[0] - bullet_aabb[0]);
-            var rightDiff = Math.abs(entity_aabb[0] + entity_aabb[2] - bullet_aabb[0] + bullet_aabb[2]);
+        /** Change direction of bullet
+         *
+         * @param {Array} line  Two points the define the plan the bullet is bouncing off of.
+         */
+        richochet: function(line) { // take your aim, fire away, fire away!
 
-            // if bullet is between entity top and bottom, its probably a side collision
-            if (topDiff < leftDiff && topDiff < rightDiff ||
-                bottomDiff < leftDiff && bottomDiff < rightDiff) {
-                _private.angle *= -1;
-            } else {
-                _private.angle = MathUtil.degreesToRadians(180 - MathUtil.radiansToDegrees(_private.angle));
+            var p1 = line[0];
+            var p2 = line[1];
+
+            // draw a line to show where the collission is
+            if (tt.debug) {
+                tt.game.addEntity(new Line(p1,p2));
             }
+
+            // the angle of the line the bullet is hitting
+            var objectAngle = MathUtil.radiansToDegrees(MathUtil.getAngle(p1[0], p1[1], p2[0], p2[1]));
+            // the angle the bullet is travelling
+            var bulletAngle = MathUtil.radiansToDegrees(_private.angle);
+            // the new angle of the bullet after bouncing
+            var newAngle = MathUtil.degreesToRadians(objectAngle + objectAngle - bulletAngle);
+
+            // show the new angle
+            if (tt.debug) {
+                var newPathX = _private.x + 50 * Math.cos(newAngle);
+                var newPathY = _private.y + 50 * Math.sin(newAngle);
+                // draw a line for the new path of the bullet
+                tt.game.addEntity(new Line([_private.x,_private.y],[newPathX,newPathY]));
+            }
+
+            // bound the bullet
+            _private.angle = newAngle;
             _private.animation.angle(_private.angle);
+            _private.bounces--;
         }
     }
 
@@ -51,12 +77,19 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
-        // move bullet
-        _private.x = _private.x + _private.speed * Math.cos(_private.angle);
-        _private.y = _private.y + _private.speed * Math.sin(_private.angle);
+        _events.moveForward(1);
 
         // update sprite
         _private.animation.update();
+
+        var numSides = 8;
+        _private.poly = [];
+        for (var i = 0; i < numSides; i++) {
+            var angle = i * Math.PI / (numSides / 2);
+            var x = _private.x + _private.radius * Math.sin(angle);
+            var y = _private.y + _private.radius * Math.cos(angle);
+            _private.poly.push([x, y]);
+        }
     }
 
     /**
@@ -74,6 +107,18 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         c.save(); //save the current draw state
         _private.animation.draw(c,[_private.x,_private.y]);
         c.restore(); //restore the previous draw state
+
+        /** draw collision areas */
+        if (tt.debug) {
+            c.strokeStyle = '#ff00ff';
+            c.beginPath();
+            c.moveTo(_private.poly[0][0],_private.poly[0][1]);
+            for(var p = 1; p < _private.poly.length; p++) {
+              c.lineTo(_private.poly[p][0],_private.poly[p][1]);
+            }
+            c.closePath();
+            c.stroke();
+        }
     }
 
     this.kill = function() {
@@ -92,34 +137,32 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 
     /** @returns {Array}  An array of lines of the form [[x1, y1], [x2, y2], ... [xn, yn]] */
     this.get_collision_poly = function() {
-        console.log('Bullet get_collision_poly not implemented yet');
+        return _private.poly;
     }
 
     this.collide_aabb = function(entity, result) {
-        // bullet vs bullet (handled in collide_circle)
 
-        // bullet vs tank = dead
-        if (entity instanceof Tank) {
-            SELF.kill();
+        var polycollision = collide.collide_poly_entities(this,entity);
 
-        // bullet vs obstacle = bounce or die
-        } else if (entity instanceof Block || entity instanceof Poly) {
-            if (!_private.bounces) {
-                this.kill();
-            } else {
-                _private.bounces--;
+        if (polycollision) {
+            if (entity instanceof Tank || !_private.bounces) {
+                return SELF.kill();
             }
 
-            _events.richochet(entity);
+            // poly collision could be intersecting lines, or 1 point
+            if (polycollision.length > 1) {
+                var line1 = polycollision[0]; // bullet
+                var line2 = polycollision[1]; // object
 
-            //if (entity instanceof Poly) {
-            //    var polycollision = collide.collide_poly_entities(this,entity);
-            //    if (polycollision) {
-            //        _events.richochet(entity);
-            //    }
-            //} else {
-            //    _events.richochet(entity);
-            //}
+                _events.richochet(line2);
+            } else {
+                console.log("single point collision", polycollision);
+
+                // the bullet must have skipped right over the edge-to-edge collission
+                // back that thang up to collide with the edge (next frame)
+
+                _events.moveForward(-1.5);
+            }
         }
     }
 

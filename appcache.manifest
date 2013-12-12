@@ -1,0 +1,28 @@
+CACHE MANIFEST
+# v1 2013-11-18
+
+NETWORK:
+*
+
+CACHE:
+/images/sandtexture.jpg
+/images/bricks.jpg
+/images/dirt1.png
+/images/grey1.png
+
+/audio/Civil%20War%20Drummer%20-SoundBible.com-700036269.mp3
+
+/socket.io/socket.io.js
+/js/lib/jquery-2.0.3.min.js
+/js/lib/jsGameSoup-v275/js/jsgamesoup.js
+/js/lib/jsGameSoup-v275/js/sprite.js
+/js/lib/jsGameSoup-v275/js/collisions.js
+/js/lib/soundmanagerv297a-20130512/script/soundmanager2-jsmin.js
+/js/Sounds.js
+/js/MathUtil.js
+/js/Alerts.js
+/js/Maps.js
+/js/Map.js
+/js/Bullet.js
+/js/Tank.js
+/js/ThunderTanks.js
