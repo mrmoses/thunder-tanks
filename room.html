@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" manifest="/appcache">
+<html lang="en">
 <head>
     <title>Thunder Tanks</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,28 +8,11 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!--<link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">-->
     <link href="css/layout.css" rel="stylesheet" />
-
-	<script>
-        function newRoom(){
-		
-            var newRoomName = $('#newRoomTxt').val();
-            var socket io.connect('http://localhost:5000/room.html');
-			socket.on(newRoomName, function() {
-				console.log("Connecting to room: " + newRoomName);
-			});
-		
-		}
-		
-	
-	</script>
-
-	
 </head>
 <body>
     <div class="container">
         <div id="session-id" class="pull-right"></div>
         <h1 title="Thunder Tanks! HHOOOOOOO!">Thunder Tanks</h1>
-		<h4>HHOOOOOOO!</h4>
         <section class="well well-sm">
             <dl id="controls" class="dl-horizontal">
                 <dt>Move</dt>
@@ -46,42 +29,31 @@
         <div class="alerts text-center">
         </div>
 
-        <div id="rooms">
-			<table>
-				<tr>
-					<td>
-						<center><h2>Room One</h2></center>
-					</td>
-					<td>
-						<center><h2>Room Two</h2></center>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<a href= '/room.html?room=roomOne'><img src ='/Images/roomOne.png' /></button></a></center>
-					</td>
-					<td>
-						<a href= '/room.html?room=roomTwo'><img src='/Images/roomTwo.png' /></button></a></center>
-					</td>
-				</tr>
-			</table>
-		</div>
-		
-		
+        <div id="game"></div>
 
+        <!-- preloaded images -->
+        <div style="display:none; visibility: hidden;">
+            <img id="sandtexture" src="images/sandtexture.jpg" />
+            <img id="bricks" src="images/bricks.jpg" />
+            <img id="dirt1" src="images/dirt1.png" />
+            <img id="grey1" src="images/grey1.png" />
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/lib/jquery-2.0.3.min.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/jsgamesoup.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/sprite.js"></script>
     <script src="js/lib/jsGameSoup-v275/js/collisions.js"></script>
-    <script src="js/lib/soundmanagerv297a-20130512/script/soundmanager2-jsmin.js"></script>
+    <script src="js/lib/jquery.ba-bbq.min.js"></script>
+	<script src="js/lib/soundmanagerv297a-20130512/script/soundmanager2-jsmin.js"></script>
     <script src="js/Sounds.js"></script>
-    <script src="js/MathUtil.js"></script>
+	<script src="js/MathUtil.js"></script>
     <script src="js/Alerts.js"></script>
     <script src="js/Maps.js"></script>
     <script src="js/Map.js"></script>
     <script src="js/Bullet.js"></script>
     <script src="js/Tank.js"></script>
     <script src="js/ThunderTanks.js"></script>
+	
 </body>

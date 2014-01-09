@@ -1,5 +1,8 @@
+var myObj = $.deparam.querystring();
+console.log(myObj);
 if (typeof io != 'undefined') {
-    var multiplayerConn = io.connect();
+    var multiplayerConn = io.connect('/' + myObj.room);
+	
     multiplayerConn.on('connect', function() {
         console.log("connected to multiplayer server");
         $('#session-id').text(multiplayerConn.socket.sessionid);
@@ -15,9 +18,10 @@ var tt = (function(tt) {
     tt.priority = 1;
 
     /** @type String The URL path (without trailing /) */
-    tt.urlPath = window.location.pathname.substr(0, window.location.pathname.length - (/\/$/.test(window.location.pathname) ? 1 : 0));
 
-    // draws collision boundaries
+    tt.urlPath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') - (/\/$/.test(window.location.pathname) ? 1 : 0));
+	   
+	// draws collision boundaries
     tt.debug = false;
 
     var _private = {
@@ -211,7 +215,11 @@ var tt = (function(tt) {
             tt.game.addEntity(tt);
 
             // add an instance of the map
-            tt.addMap(TTMaps.Classic);
+
+			if(myObj.room === 'roomOne')
+				tt.addMap(TTMaps.PolyTest);
+			else
+				tt.addMap(TTMaps.Classic);
 
             // launch the game
             tt.game.launch();

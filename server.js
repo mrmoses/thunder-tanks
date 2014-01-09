@@ -24,24 +24,40 @@ app.get('/credits', function(req, res){
   res.sendfile('credits.html');
 });
 
+
 app.get('/', function(req, res){
   res.sendfile('index.html');
+});
+app.get('/index.html', function(req, res){
+  res.sendfile('index.html');
+});
+
+app.get('/room.html', function(req, res){
+  res.sendfile('room.html');
 });
 
 console.log('Listening on port ' + port);
 
 /** Here be multiplayer dragons */
 
-var tanks = {};
+var tanksRoomOne = {};
+var tanksRoomTwo = {};
 
-io.sockets.on('connection', function (socket) {
-  //console.log("new player connecting", socket.id);
+var roomOne = io.of('/roomOne');
+roomOne.on('connection', function (socket) {
+  console.log("new player connecting to roomOne", socket.id);
 
-  new Player(socket);
+  new Player(socket, tanksRoomOne, roomOne);
+});
+var roomTwo = io.of('/roomTwo');
+roomTwo.on('connection', function (socket) {
+  console.log("new player connecting to roomTwo", socket.id);
+
+  new Player(socket, tanksRoomTwo, roomTwo);
 });
 
-/** An server side instance of a Player */
-function Player(socket) {
+/** A server side instance of a Player */
+function Player(socket, tanks, room) {
   var SELF = this;
 
   this.id = socket.id;
@@ -85,7 +101,7 @@ function Player(socket) {
     //tanks[data.id].aimAngle = data.aimAngle;
 
     //send update to all players (including the player that added the tank)
-    io.sockets.emit('add-tank', tanks[data.id]);
+    room.emit('add-tank', tanks[data.id]);
   });
 
   // when this player is updated, send data to all remote players
