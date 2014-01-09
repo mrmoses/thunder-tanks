@@ -109,9 +109,8 @@ var tt = (function(tt) {
      * @param {Boolean} remote  True if the tanks is a remote tanks
      */
     tt.addTank = function(data, remote) {
-        _private.tanks[data.id] = new Tank(tt, data, remote);
+        tt.game.addEntity(_private.tanks[data.id] = new Tank(tt, data, remote));
         _private.tankArray = $.map(_private.tanks, function(value,index) { return value;})
-        tt.game.addEntity(_private.tanks[data.id]);
         return _private.tanks[data.id];
     }
 
@@ -226,13 +225,7 @@ var tt = (function(tt) {
 
             if (typeof multiplayerConn != 'undefined') {
                 multiplayerConn.on('add-tank', function (data) {
-                    var isRemote = data.id !== multiplayerConn.socket.sessionid;
-                    // local player tank
-                    if (isRemote) {
-                        tt.addTank(data, isRemote);
-                    } else {
-                        tt.addTank(data, isRemote);
-                    }
+                    tt.addTank(data, data.id !== multiplayerConn.socket.sessionid);
                 });
                 multiplayerConn.on('add-bullet', function (data) {
                     // add bullet
