@@ -60,19 +60,10 @@ function Tank(tt, data, remote) {
         ),
     }
 
-    /**
-     * @param {JSGameSoup} gs JSGameSoup instance
-     */
-    this.update = function(gs) {
-        _private.angle += _private.turnSpeed;
-
+    function getPoly() {
         // these calculation are used a lot, so its done once here
         var cosA = Math.cos(_private.angle);
         var sinA = Math.sin(_private.angle);
-
-        // move tank
-        _private.x = _private.x + _private.speed * cosA;
-        _private.y = _private.y + _private.speed * sinA;
 
         // more calculations that are reused, so they are calculated once here
         var LcosA = _private.length/2 * cosA;
@@ -105,6 +96,24 @@ function Tank(tt, data, remote) {
             [_private.corner3x,_private.corner3y],
             [_private.corner4x,_private.corner4y]
         ];
+    }
+
+    /**
+     * @param {JSGameSoup} gs JSGameSoup instance
+     */
+    this.update = function(gs) {
+        _private.angle += _private.turnSpeed;
+
+        // these calculation are used a lot, so its done once here
+        var cosA = Math.cos(_private.angle);
+        var sinA = Math.sin(_private.angle);
+
+        // move tank
+        _private.x = _private.x + _private.speed * cosA;
+        _private.y = _private.y + _private.speed * sinA;
+
+        // update poly points
+	getPoly();
 
         if (!_private.remote) {
             // update aim
@@ -405,5 +414,10 @@ function Tank(tt, data, remote) {
 
     this.collide_polygon = function(entity, result) {
         //console.log('Tank collide_polygon', entity, result);
-    }
+    };
+
+    // init
+    (function() {
+	getPoly();
+    })();
 }
