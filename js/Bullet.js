@@ -16,6 +16,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         speed: speed || 5,
         radius: 3,
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
+        poly: [], // poly collision boundary
         bounces: 1,
         animation: new Sprite(["center","center"], {
             "move": [[SELF.tt.urlPath + '/images/bullet1.png', 7],[SELF.tt.urlPath + '/images/bullet2.png', 7]]
@@ -73,6 +74,17 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         }
     }
 
+    function getPoly() {
+        var numSides = 8;
+        _private.poly = [];
+        for (var i = 0; i < numSides; i++) {
+            var angle = i * Math.PI / (numSides / 2);
+            var x = _private.x + _private.radius * Math.sin(angle);
+            var y = _private.y + _private.radius * Math.cos(angle);
+            _private.poly.push([x, y]);
+        }
+    }
+
     /**
      * @param {JSGameSoup} gs JSGameSoup instance
      */
@@ -82,14 +94,8 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         // update sprite
         _private.animation.update();
 
-        var numSides = 8;
-        _private.poly = [];
-        for (var i = 0; i < numSides; i++) {
-            var angle = i * Math.PI / (numSides / 2);
-            var x = _private.x + _private.radius * Math.sin(angle);
-            var y = _private.y + _private.radius * Math.cos(angle);
-            _private.poly.push([x, y]);
-        }
+        // update poly points
+	getPoly();
     }
 
     /**
@@ -174,5 +180,10 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 
     this.collide_polygon = function(entity, result) {
         console.log('bullet collide_polygon', entity, result);
-    }
+    };
+
+    // init
+    (function() {
+	getPoly();
+    })();
 }
