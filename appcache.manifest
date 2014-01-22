@@ -14,6 +14,7 @@ CACHE:
 
 /socket.io/socket.io.js
 /js/lib/jquery-2.0.3.min.js
+/js/lib/physicsjs-full-0.5.3.min.js
 /js/lib/jsGameSoup-v275/js/jsgamesoup.js
 /js/lib/jsGameSoup-v275/js/sprite.js
 /js/lib/jsGameSoup-v275/js/collisions.js
