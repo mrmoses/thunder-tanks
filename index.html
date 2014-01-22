@@ -8,22 +8,6 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!--<link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">-->
     <link href="css/layout.css" rel="stylesheet" />
-
-	<script>
-        function newRoom(){
-		
-            var newRoomName = $('#newRoomTxt').val();
-            var socket io.connect('http://localhost:5000/room.html');
-			socket.on(newRoomName, function() {
-				console.log("Connecting to room: " + newRoomName);
-			});
-		
-		}
-		
-	
-	</script>
-
-	
 </head>
 <body>
     <div class="container">
@@ -66,22 +50,8 @@
 				</tr>
 			</table>
 		</div>
-		
-		
+    </div>
 
 
-    <script src="/socket.io/socket.io.js"></script>
     <script src="js/lib/jquery-2.0.3.min.js"></script>
-    <script src="js/lib/jsGameSoup-v275/js/jsgamesoup.js"></script>
-    <script src="js/lib/jsGameSoup-v275/js/sprite.js"></script>
-    <script src="js/lib/jsGameSoup-v275/js/collisions.js"></script>
-    <script src="js/lib/soundmanagerv297a-20130512/script/soundmanager2-jsmin.js"></script>
-    <script src="js/Sounds.js"></script>
-    <script src="js/MathUtil.js"></script>
-    <script src="js/Alerts.js"></script>
-    <script src="js/Maps.js"></script>
-    <script src="js/Map.js"></script>
-    <script src="js/Bullet.js"></script>
-    <script src="js/Tank.js"></script>
-    <script src="js/ThunderTanks.js"></script>
 </body>
