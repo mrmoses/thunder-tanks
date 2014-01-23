@@ -25,6 +25,13 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
             _private.animation.angle(_private.angle);
         })
     };
+    _private.physCircle = Physics.body('circle', {
+        x: _private.x,
+        y: _private.y,
+        vx: 0.22,
+        vy: 0.22,
+        radius: _private.radius
+    });
 
     if (tt.debug) {
         // draw a line for the initial path of the bullet
@@ -95,7 +102,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         _private.animation.update();
 
         // update poly points
-	getPoly();
+        getPoly();
     }
 
     /**
@@ -107,6 +114,12 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         c.beginPath();
         c.arc(_private.x, _private.y, _private.radius + 1, 0, 2 * Math.PI, false);
         c.lineWidth = 1;
+        c.stroke();
+
+        // draw physCircle
+        c.strokeStyle = '#ff00ff';
+        c.beginPath();
+        c.arc(_private.physCircle.state.pos['_'][0], _private.physCircle.state.pos['_'][1], _private.physCircle.options.radius + 1, 0, 2 * Math.PI, false);
         c.stroke();
 
         // draw sprite
@@ -184,6 +197,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 
     // init
     (function() {
-	getPoly();
+        getPoly();
+        tt.world.add( _private.physCircle );
     })();
 }

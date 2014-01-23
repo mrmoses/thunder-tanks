@@ -2,7 +2,7 @@ var myObj = $.deparam.querystring();
 console.log(myObj);
 if (typeof io != 'undefined') {
     var multiplayerConn = io.connect('/' + myObj.room);
-	
+
     multiplayerConn.on('connect', function() {
         console.log("connected to multiplayer server");
         $('#session-id').text(multiplayerConn.socket.sessionid);
@@ -20,9 +20,11 @@ var tt = (function(tt) {
     /** @type String The URL path (without trailing /) */
 
     tt.urlPath = window.location.pathname.substr(0, window.location.pathname.lastIndexOf('/') - (/\/$/.test(window.location.pathname) ? 1 : 0));
-	   
-	// draws collision boundaries
+
+    // draws collision boundaries
     tt.debug = false;
+
+    tt.world = Physics();
 
     var _private = {
         /** Tanks by id **/
@@ -45,18 +47,19 @@ var tt = (function(tt) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     tt.update = function(gs) {
+        tt.world.step(new Date().getTime());
         //collide bullets and map objects
-        collide.aabb(_private.bullets, _private.obstacles);
+        //collide.aabb(_private.bullets, _private.obstacles);
 
         // collide bullets and bullets
-        collide.circles(_private.bullets, _private.bullets);
+        //collide.circles(_private.bullets, _private.bullets);
 
         // collide bullets and tanks
-        collide.aabb(_private.bullets, _private.tankArray);
+        //collide.aabb(_private.bullets, _private.tankArray);
 
 
         // collide tanks and map objects
-        collide.aabb(_private.tankArray, _private.obstacles);
+        //collide.aabb(_private.tankArray, _private.obstacles);
 
         // collide tanks and tanks
         //collide.aabb(_private.tankArray, _private.tankArray);
@@ -215,10 +218,10 @@ var tt = (function(tt) {
 
             // add an instance of the map
 
-			if(myObj.room === 'roomOne')
-				tt.addMap(TTMaps.PolyTest);
-			else
-				tt.addMap(TTMaps.Classic);
+            if(myObj.room === 'roomOne')
+                tt.addMap(TTMaps.PolyTest);
+            else
+                tt.addMap(TTMaps.Classic);
 
             // launch the game
             tt.game.launch();
