@@ -58,7 +58,7 @@ function Tank(tt, data, remote) {
                 _private.turretSprite.angle(_private.aimAngle);
             }
         ),
-    }
+    };
 
     function getPoly() {
         // these calculation are used a lot, so its done once here
@@ -165,6 +165,19 @@ function Tank(tt, data, remote) {
         c.rotate(_private.aimAngle);
 		if(_private.turretSprite)
 			_private.turretSprite.draw(c, [0 , 0]);
+        c.restore();
+
+        c.save();
+        c.translate(_private.x,_private.y);
+	c.strokeStyle = '#ff00ff';
+	c.beginPath();
+	c.moveTo(_private.physSquare.geometry.vertices[0]['_'][0],_private.physSquare.geometry.vertices[0]['_'][1]);
+	for(var p = 1; p < _private.physSquare.geometry.vertices.length; p++) {
+	    var v = _private.physSquare.geometry.vertices[p]['_'];
+	    c.lineTo(v[0],v[1]);
+	}
+	c.closePath();
+	c.stroke();
         c.restore(); //restore the previous draw state
 
         /** The rest of this draw function is used for debugging */
@@ -419,5 +432,18 @@ function Tank(tt, data, remote) {
     // init
     (function() {
 	getPoly();
+
+	// create and add physics object
+	_private.physSquare = Physics.body('convex-polygon', {
+	    x: _private.x,
+	    y: _private.y,
+	    vertices: [
+		{x: _private.poly[0][0], y: _private.poly[0][1]},
+		{x: _private.poly[1][0], y: _private.poly[1][1]},
+		{x: _private.poly[2][0], y: _private.poly[2][1]},
+		{x: _private.poly[3][0], y: _private.poly[3][1]},
+	    ]
+	});
+        tt.world.add( _private.physSquare );
     })();
 }
