@@ -13,7 +13,7 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         y: starty || this.game.height/2,
         targetx: targetx || this.game.random(0,this.game.width),
         targety: targety || this.game.random(0,this.game.height),
-        speed: speed || 5,
+        speed: speed || 0.22,
         radius: 3,
         angle: MathUtil.getAngle(startx,starty,targetx,targety),
         poly: [], // poly collision boundary
@@ -28,8 +28,8 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     _private.physCircle = Physics.body('circle', {
         x: _private.x,
         y: _private.y,
-        vx: 0.22,
-        vy: 0.22,
+        vx: _private.speed * Math.cos(_private.angle),
+        vy: _private.speed * Math.sin(_private.angle),
         radius: _private.radius
     });
 
@@ -96,7 +96,9 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
-        _events.moveForward(1);
+        // get position from phys object
+        _private.x = _private.physCircle.state.pos['_'][0];
+        _private.y = _private.physCircle.state.pos['_'][1];
 
         // update sprite
         _private.animation.update();
@@ -114,12 +116,6 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
         c.beginPath();
         c.arc(_private.x, _private.y, _private.radius + 1, 0, 2 * Math.PI, false);
         c.lineWidth = 1;
-        c.stroke();
-
-        // draw physCircle
-        c.strokeStyle = '#ff00ff';
-        c.beginPath();
-        c.arc(_private.physCircle.state.pos['_'][0], _private.physCircle.state.pos['_'][1], _private.physCircle.options.radius + 1, 0, 2 * Math.PI, false);
         c.stroke();
 
         // draw sprite
