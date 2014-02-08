@@ -111,10 +111,9 @@ function Tank(tt, data, remote) {
         var sinA = Math.sin(_private.angle);
 
         // move tank
-        _private.physSquare.state.vel._['0'] = _private.speed * cosA;
-        _private.physSquare.state.vel._['1'] = _private.speed * sinA;
-        _private.x = _private.physSquare.state.pos['_'][0];
-        _private.y = _private.physSquare.state.pos['_'][1];
+        _private.physSquare.state.vel.set(_private.speed * cosA, _private.speed * sinA);
+        _private.x = _private.physSquare.state.pos.get(0);
+        _private.y = _private.physSquare.state.pos.get(1);
 
         // update poly points
         getPoly();
@@ -173,14 +172,14 @@ function Tank(tt, data, remote) {
 
         // draws the physSquare
         //c.save();
-        //c.translate(_private.physSquare.state.pos['_'][0],_private.physSquare.state.pos['_'][1]);
+        //c.translate(_private.physSquare.state.pos.get(0),_private.physSquare.state.pos.get(1));
         //c.rotate(_private.physSquare.state.angular.pos);
         //c.strokeStyle = '#ff00ff';
         //c.beginPath();
-        //c.moveTo(_private.physSquare.geometry.vertices[0]['_'][0],_private.physSquare.geometry.vertices[0]['_'][1]);
+        //c.moveTo(_private.physSquare.geometry.vertices[0].get(0),_private.physSquare.geometry.vertices[0].get(1));
         //for(var p = 1; p < _private.physSquare.geometry.vertices.length; p++) {
-        //    var v = _private.physSquare.geometry.vertices[p]['_'];
-        //    c.lineTo(v[0],v[1]);
+        //    var v = _private.physSquare.geometry.vertices[p];
+        //    c.lineTo(v.get(0),v.get(1));
         //}
         //c.closePath();
         //c.stroke();
