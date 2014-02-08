@@ -23,9 +23,10 @@ function Tank(tt, data, remote) {
         angle: 0, // angle in radians
         poly: [], // array of points that (corners of the tank)
         speed: 0,
-        maxSpeed: 2,
+        accelRate: 0.01,
+        maxSpeed: 0.12,
         turnSpeed: 0,
-        maxTurnSpeed: 0.1,
+        maxTurnSpeed: 0.005,
         aimAngle: MathUtil.degreesToRadians(0),
         firing: false,
         fireRate: 5, // number of shots per sec
@@ -102,18 +103,21 @@ function Tank(tt, data, remote) {
      * @param {JSGameSoup} gs JSGameSoup instance
      */
     this.update = function(gs) {
-        _private.angle += _private.turnSpeed;
+        _private.physSquare.state.angular.vel = _private.turnSpeed;
+        _private.angle = _private.physSquare.state.angular.pos;
 
         // these calculation are used a lot, so its done once here
         var cosA = Math.cos(_private.angle);
         var sinA = Math.sin(_private.angle);
 
         // move tank
-        _private.x = _private.x + _private.speed * cosA;
-        _private.y = _private.y + _private.speed * sinA;
+        _private.physSquare.state.vel._['0'] = _private.speed * cosA;
+        _private.physSquare.state.vel._['1'] = _private.speed * sinA;
+        _private.x = _private.physSquare.state.pos['_'][0];
+        _private.y = _private.physSquare.state.pos['_'][1];
 
         // update poly points
-	getPoly();
+        getPoly();
 
         if (!_private.remote) {
             // update aim
@@ -155,30 +159,32 @@ function Tank(tt, data, remote) {
 
         // draw tank sprite
         c.save(); //save the current draw state
-		if(_private.tankSprite)
-			_private.tankSprite.draw(c, [_private.x, _private.y]);
+        if(_private.tankSprite)
+            _private.tankSprite.draw(c, [_private.x, _private.y]);
         c.restore(); //restore the previous draw state
 
         // draw cannon
         c.save();
         c.translate(_private.x,_private.y);
         c.rotate(_private.aimAngle);
-		if(_private.turretSprite)
-			_private.turretSprite.draw(c, [0 , 0]);
+        if(_private.turretSprite)
+            _private.turretSprite.draw(c, [0 , 0]);
         c.restore();
 
-        c.save();
-        c.translate(_private.x,_private.y);
-	c.strokeStyle = '#ff00ff';
-	c.beginPath();
-	c.moveTo(_private.physSquare.geometry.vertices[0]['_'][0],_private.physSquare.geometry.vertices[0]['_'][1]);
-	for(var p = 1; p < _private.physSquare.geometry.vertices.length; p++) {
-	    var v = _private.physSquare.geometry.vertices[p]['_'];
-	    c.lineTo(v[0],v[1]);
-	}
-	c.closePath();
-	c.stroke();
-        c.restore(); //restore the previous draw state
+        // draws the physSquare
+        //c.save();
+        //c.translate(_private.physSquare.state.pos['_'][0],_private.physSquare.state.pos['_'][1]);
+        //c.rotate(_private.physSquare.state.angular.pos);
+        //c.strokeStyle = '#ff00ff';
+        //c.beginPath();
+        //c.moveTo(_private.physSquare.geometry.vertices[0]['_'][0],_private.physSquare.geometry.vertices[0]['_'][1]);
+        //for(var p = 1; p < _private.physSquare.geometry.vertices.length; p++) {
+        //    var v = _private.physSquare.geometry.vertices[p]['_'];
+        //    c.lineTo(v[0],v[1]);
+        //}
+        //c.closePath();
+        //c.stroke();
+        //c.restore(); //restore the previous draw state
 
         /** The rest of this draw function is used for debugging */
         if (this.tt.debug) {
@@ -240,11 +246,11 @@ function Tank(tt, data, remote) {
 
         // up (W)
         this.keyDown_38 = this.keyDown_87 = function () {
-            _private.speed = 1;
+            _private.speed = _private.accelRate;
         }
         this.keyHeld_38 = this.keyHeld_87 = function () {
             if (_private.speed < _private.maxSpeed)
-                _private.speed += 1;
+                _private.speed += _private.accelRate;
         }
         this.keyUp_38 = this.keyUp_87 = function () {
             _private.speed = 0;
@@ -252,11 +258,11 @@ function Tank(tt, data, remote) {
 
         // down (S)
         this.keyDown_40 = this.keyDown_83 = function () {
-            _private.speed = -0.3;
+            _private.speed = -(_private.accelRate/2);
         }
         this.keyHeld_40 = this.keyHeld_83 = function () {
-            if (_private.speed > -_private.maxSpeed)
-                _private.speed -= 0.3;
+            if (_private.speed > -(_private.maxSpeed/2))
+                _private.speed -= _private.accelRate/2;
         }
         this.keyUp_40 = this.keyUp_83 = function () {
             _private.speed = 0;
@@ -431,19 +437,21 @@ function Tank(tt, data, remote) {
 
     // init
     (function() {
-	getPoly();
+        getPoly();
 
-	// create and add physics object
-	_private.physSquare = Physics.body('convex-polygon', {
-	    x: _private.x,
-	    y: _private.y,
-	    vertices: [
-		{x: _private.poly[0][0], y: _private.poly[0][1]},
-		{x: _private.poly[1][0], y: _private.poly[1][1]},
-		{x: _private.poly[2][0], y: _private.poly[2][1]},
-		{x: _private.poly[3][0], y: _private.poly[3][1]},
-	    ]
-	});
+        // create and add physics object
+        _private.physSquare = Physics.body('convex-polygon', {
+            x: _private.x,
+            y: _private.y,
+            cof: 0.8,
+            angle: _private.angle,
+            vertices: [
+                {x: _private.poly[0][0], y: _private.poly[0][1]},
+                {x: _private.poly[1][0], y: _private.poly[1][1]},
+                {x: _private.poly[2][0], y: _private.poly[2][1]},
+                {x: _private.poly[3][0], y: _private.poly[3][1]},
+            ]
+        });
         tt.world.add( _private.physSquare );
     })();
 }
