@@ -32,8 +32,10 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 		restitution: 1.0,
         vx: _private.speed * Math.cos(_private.angle),
         vy: _private.speed * Math.sin(_private.angle),
-        radius: _private.radius
+        radius: _private.radius,
+        restitution: 1.0
     });
+    _private.physCircle._type = 'bullet';
 
     if (tt.debug) {
         // draw a line for the initial path of the bullet
@@ -139,7 +141,25 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     }
 
     this.kill = function() {
+        tt.world.removeBody( _private.physCircle );
         this.tt.removeBullet(_private.bulletIndex);
+    }
+
+    // overwrite the collide handler
+    _private.physCircle.collide = function(obj) {
+        // sometimes a collision triggers multiple times
+        // so check to make sure this isnt the same object
+        // this doesnt really work because the outer boundary is 1 object
+        console.log("collision", obj.type);
+        if (obj != _private.lastCollission) {
+            _private.lastCollission = obj;
+
+            if (obj._type === 'bullet' || obj._type === 'tank' || _private.bounces === 0) {
+                SELF.kill();
+            } else {
+                _private.bounces--;
+            }
+        }
     }
 
     /* @returns[Array] a rectangle of the boundaries of the entity with the form [x, y, w, h] */
