@@ -10,8 +10,9 @@ function Map(tt, MapConfig) {
   // cached, fully rendered map
   var background_img = new Image();
 
+
   this.draw = function(c,gs) {
-    c.drawImage(background_img, 0, 0);
+  //  c.drawImage(background_img, 0, 0);
   }
 
   this.init = function() {
@@ -32,6 +33,7 @@ function Map(tt, MapConfig) {
     this.tt.addObstacle(new Block(tt, 0, this.game.height-32, this.game.width, 32, grey1)); // bottom
     this.tt.addObstacle(new Block(tt, 0, 32, 32, this.game.height - 30, grey1)); // left
     this.tt.addObstacle(new Block(tt, this.game.width - 32, 32, 32, this.game.height - 32, grey1)); // right
+	
 
     // blocks
     for(var i=0; i<MapConfig.Blocks.length; i++) {
@@ -122,17 +124,42 @@ function Block(tt, x, y, w, h, img) {
         [x,y+h]
       ],
       imgCache: new Image()
-  }
+  };
+	_private.physSquare = Physics.body('convex-polygon', {
+		x: x + w / 2,
+		y: y + h / 2,
+		fixed: true,
+		restitution: 1.0,
+		vertices:[
+			{x: _private.leftX, y: _private.topY},
+			{x: _private.leftX + _private.width, y: _private.topY},
+			{x: _private.leftX + _private.width, y: _private.topY + _private.height},
+			{x: _private.leftX, y: _private.topY + _private.height }
+		]
+	});
 
-  //this.draw = function(c, gs) {
-  //  this._draw(c);
-  //}
+  this.draw = function(c, gs) {
+    this._draw(c);
+  }
 
   this._draw = function(c) {
     c.drawImage(_private.imgCache, _private.leftX, _private.topY);
     c.strokeStyle = '#000000';
     c.rect(_private.leftX, _private.topY, _private.width, _private.height);
     c.stroke();
+	
+		c.save();
+    c.translate(_private.physSquare.state.pos._[0], _private.physSquare.state.pos._[1]);
+	c.strokeStyle = '#ff00ff';
+	c.beginPath();
+	c.moveTo(_private.physSquare.geometry.vertices[0]['_'][0],_private.physSquare.geometry.vertices[0]['_'][1]);
+	for(var p = 1; p < _private.physSquare.geometry.vertices.length; p++) {
+	    var v = _private.physSquare.geometry.vertices[p]['_'];
+	    c.lineTo(v[0],v[1]);
+	}
+	c.closePath();
+	c.stroke();
+	c.restore(); //restore the previous draw state
   }
 
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
@@ -155,6 +182,8 @@ function Block(tt, x, y, w, h, img) {
   };
 
   (function() {
+	tt.world.add( _private.physSquare );
+	tt.world.add( Physics.behavior('body-collision-detection') );
     // render full map in memory and store as an image
     var canvasCache = document.createElement('canvas');
     canvasCache.setAttribute('width',_private.width);
@@ -171,15 +200,19 @@ function Block(tt, x, y, w, h, img) {
 
 function Poly(tt, points) {
   var SELF = this;
+  
+   var _private = {  };
+   
+   
 
   var minX = points[0][0];
   var minY = points[0][1];
   var maxX = points[0][0];
   var maxY = points[0][1];
 
-  //this.draw = function(c, gs) {
-  //  this._draw(c);
-  //}
+  this.draw = function(c, gs) {
+    this._draw(c);
+  }
 
   this._draw = function(c) {
     c.strokeStyle = '#000000';
@@ -193,6 +226,23 @@ function Poly(tt, points) {
     c.closePath();
     c.stroke();
     c.fill();
+	
+	
+	
+    c.save();
+    c.translate(_private.physPoly.state.pos._[0], _private.physPoly.state.pos._[1]);
+	c.strokeStyle = '#ff00ff';
+	c.beginPath();
+	c.moveTo(_private.physPoly.geometry.vertices[0]['_'][0],_private.physPoly.geometry.vertices[0]['_'][1]);
+	for(var p = 1; p < _private.physPoly.geometry.vertices.length; p++) {
+	    var v = _private.physPoly.geometry.vertices[p]['_'];
+	    c.lineTo(v[0],v[1]);
+	}
+	c.closePath();
+	c.stroke();
+	c.restore(); //restore the previous draw state
+	
+	
   }
 
   /** @returns {Array}  A rectangle of the boundaries of the entity with the form [x, y, w, h] */
@@ -204,13 +254,32 @@ function Poly(tt, points) {
   this.get_collision_poly = function() {
     return points;
   };
-
+  
   (function() {
-    for(var p = 1; p < points.length; p++) {
+	var physVs = [];
+	var allx = 0;
+	var ally = 0;
+	
+    for(var p = 0; p < points.length; p++) {
       minX = Math.min(minX, points[p][0]);
       minY = Math.min(minY, points[p][1]);
       maxX = Math.max(maxX, points[p][0]);
       maxY = Math.max(maxY, points[p][1]);
+	  
+	  allx+=points[p][0];
+	  ally+=points[p][1];
+	  
+	  physVs[physVs.length] = {x: points[p][0], y: points[p][1]};
     }
+	
+	_private.physPoly = Physics.body('convex-polygon', {
+		x: allx/physVs.length,
+		y: ally/physVs.length,
+		fixed: true,
+		restitution: 1.0,
+		vertices:physVs
+	});
+	tt.world.add( _private.physPoly );
+	tt.world.add( Physics.behavior('body-collision-detection') );
   })();
 }
