@@ -377,6 +377,7 @@ function Tank(tt, data, remote) {
     }
 
     this.kill = function() {
+        tt.world.removeBody( _private.physSquare );
         this.tt.removeTank(SELF.id);
     }
 
@@ -451,6 +452,14 @@ function Tank(tt, data, remote) {
                 {x: _private.poly[3][0], y: _private.poly[3][1]},
             ]
         });
+        _private.physSquare._type = 'tank';
+        // overwrite the collide handler
+        _private.physSquare.collide = function(obj) {
+            if (obj._type === 'bullet') {
+                SELF.kill();
+            }
+        }
+
         tt.world.add( _private.physSquare );
     })();
 }

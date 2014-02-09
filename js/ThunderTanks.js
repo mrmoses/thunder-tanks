@@ -68,6 +68,9 @@ var tt = (function(tt) {
     }
 
     tt.draw = function(c, gs) {
+      // render the Physics world
+      //tt.world.render();
+
       /** draw collision areas */
       if (tt.debug) {
         var entities = _private.tankArray.concat(_private.obstacles);
@@ -213,11 +216,96 @@ var tt = (function(tt) {
             // use the DIV tag with Id of 'surface' as our game surface
             tt.game = new JSGameSoup("game", 60);
 
+            tt.world.add( Physics.behavior('body-impulse-response') );
+            tt.world.add( Physics.behavior('body-collision-detection') );
+            tt.world.add( Physics.behavior('sweep-prune') );
+
+            // add canvas as renderer of the physics engine
+            var physRenderer = Physics.renderer('canvas', {
+                el: tt.game.canvas,
+                width: tt.game.width,
+                height: tt.game.height,
+                meta: false,
+                styles: {
+                    'convex-polygon' : {
+                        strokeStyle: '#ff00ff'
+                    },
+                    'circle' : {
+                        strokeStyle: '#ff00ff',
+                        lineWidth: 1,
+                        fillStyle: 'hsla(60, 37%, 57%, 0.8)',
+                        angleIndicator: 'hsla(60, 37%, 17%, 0.4)'
+                    }
+                }
+            });
+            tt.world.add(physRenderer);
+
+            //var square = Physics.body('convex-polygon', {
+            //    x: 250,
+            //    y: 250,
+            //    fixed: true,
+            //    vertices: [
+            //        {x: 0, y: 50},
+            //        {x: 50, y: 50},
+            //        {x: 50, y: 0},
+            //        {x: 0, y: 0}
+            //    ]
+            //});
+            //tt.world.add( square );
+            //
+            //tt.world.add( Physics.body('convex-polygon', {
+            //    x: 250,
+            //    y: 50,
+            //    fixed: true,
+            //    //restitution: 1.0,
+            //    vertices: [
+            //        {x: 0, y: 80},
+            //        {x: 60, y: 40},
+            //        {x: 60, y: -40},
+            //        {x: 0, y: -80}
+            //    ]
+            //}) );
+            //
+            //tt.world.add( Physics.body('convex-polygon', {
+            //    x: 400,
+            //    y: 200,
+            //    fixed: true,
+            //    //restitution: 1.0,
+            //    vertices: [
+            //        {x: 0, y: 80},
+            //        {x: 80, y: 0},
+            //        {x: 0, y: -80},
+            //        {x: -30, y: -30},
+            //        {x: -30, y: 30}
+            //    ]
+            //}) );
+
+            // mixin to the base body class. Adds a method to all bodies.
+            Physics.body.mixin('collide', function( other ){
+                if ( other ){
+                    // do some default action
+                }
+                return true;
+            });
+
+            tt.world.subscribe('collisions:detected', function( data ) {
+                console.log('collisions:detected',data);
+                var c;
+                for (var i = 0, l = data.collisions.length; i < l; i++){
+                    c = data.collisions[ i ];
+                    if ( c.bodyA.collide ){
+                        c.bodyA.collide( c.bodyB );
+                    }
+                    if ( c.bodyB.collide ){
+                        c.bodyB.collide( c.bodyA );
+                    }
+                }
+            });
+
             // add this instance of ThunderTanks
             tt.game.addEntity(tt);
 
             // add an instance of the map
-
             if(myObj.room === 'roomOne')
                 tt.addMap(TTMaps.PolyTest);
             else
@@ -239,7 +327,7 @@ var tt = (function(tt) {
                     _private.tanks[data.id].remoteUpdate(data);
                 });
                 multiplayerConn.on('remove-tank', function (id) {
-                    tt.removeTank(id);
+                    _private.tanks[data.id].kill();
                 });
             } else {
                 tt.playSound('drummerTheme');
