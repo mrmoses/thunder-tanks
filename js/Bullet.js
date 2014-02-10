@@ -6,7 +6,6 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
 
     /** @type JSGameSoup */
     this.game = tt.game;
-	
     var _private = {
         bulletIndex: bulletIndex,
         x: startx || this.game.width/2,
@@ -28,12 +27,10 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     _private.physCircle = Physics.body('circle', {
         x: _private.x,
         y: _private.y,
-				fixed: false,
-		restitution: 1.0,
+        restitution: 1.0,
         vx: _private.speed * Math.cos(_private.angle),
         vy: _private.speed * Math.sin(_private.angle),
-        radius: _private.radius,
-        restitution: 1.0
+        radius: _private.radius
     });
     _private.physCircle._type = 'bullet';
 
@@ -217,6 +214,5 @@ function Bullet(tt, bulletIndex, startx, starty, targetx, targety, speed) {
     (function() {
         getPoly();
         tt.world.add( _private.physCircle );
-			tt.world.add( Physics.behavior('body-collision-detection') );
     })();
 }

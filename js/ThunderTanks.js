@@ -24,11 +24,8 @@ var tt = (function(tt) {
     // draws collision boundaries
     tt.debug = false;
 
-	// These make the physics work, but currently are super slow
-    //tt.world = Physics();
-	//tt.world.add( Physics.behavior('sweep-prune') );
-	//tt.world.add( Physics.behavior('body-impulse-response'));
-	
+    tt.world = Physics();
+
     var _private = {
         /** Tanks by id **/
         tanks: {},
@@ -316,7 +313,6 @@ var tt = (function(tt) {
 
             // launch the game
             tt.game.launch();
-//						tt.world.add( Physics.behavior('constant-acceleration') );
 
             if (typeof multiplayerConn != 'undefined') {
                 multiplayerConn.on('add-tank', function (data) {
